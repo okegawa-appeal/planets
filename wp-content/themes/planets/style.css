@@ -48,7 +48,7 @@ Version: 1.0.0
 .category-container .category-item a {
 	width: 100%;
 }
-.category-container .category-item span{
+.category-container .category-item span.reserve{
   position: absolute;     /* 相対位置に指定 */
   top: -20px;             /* 表示位置を上から-10pxの位置にする */
   left: -15px;/* 表示位置を右から内側に10pxの位置 */
@@ -56,10 +56,42 @@ Version: 1.0.0
   font-weight: bold;      /* 太文字にする */
   line-height: 40px;      /* 行の高さを指定 */
   text-align: center;     /* 文字を中央揃えにする */
-  background: linear-gradient(220.55deg, #FFF500 0%, #ff0000 100%);    /* 背景色をオレンジに指定 */
+  background: linear-gradient(220.55deg, #00f5ff 0%, #0000ff 100%);    /* 背景色をオレンジに指定 */
   width: 40px;
   height: 40px;
-	border-radius: 20px;    /* line-heightの半分の角丸を指定 */
+  border-radius: 20px;    /* line-heightの半分の角丸を指定 */
+  min-width: 20px;        /* 最低幅を指定 */
+  padding: 0 3px;         /* 左右に少しだけ余白を設定 */
+  box-sizing: border-box; /* 計算しやすいように */
+}
+.category-container .category-item span.onsale{
+  position: absolute;     /* 相対位置に指定 */
+  top: -20px;             /* 表示位置を上から-10pxの位置にする */
+  right: -15px;/* 表示位置を右から内側に10pxの位置 */
+  color: #FFF;            /* 文字色を白に指定 */
+  font-weight: bold;      /* 太文字にする */
+  line-height: 40px;      /* 行の高さを指定 */
+  text-align: center;     /* 文字を中央揃えにする */
+  background: linear-gradient(220.55deg, #FFF500 0%, #ff0000 100%);    /* 背景色をオレンジに指定 */
+  width: 60px;
+  height: 40px;
+  border-radius: 20px;    /* line-heightの半分の角丸を指定 */
+  min-width: 20px;        /* 最低幅を指定 */
+  padding: 0 3px;         /* 左右に少しだけ余白を設定 */
+  box-sizing: border-box; /* 計算しやすいように */
+}
+.category-container .category-item span.finish{
+  position: absolute;     /* 相対位置に指定 */
+  top: -20px;             /* 表示位置を上から-10pxの位置にする */
+  right: -15px;/* 表示位置を右から内側に10pxの位置 */
+  color: #FFF;            /* 文字色を白に指定 */
+  font-weight: bold;      /* 太文字にする */
+  line-height: 40px;      /* 行の高さを指定 */
+  text-align: center;     /* 文字を中央揃えにする */
+  background: linear-gradient(220.55deg, #aaa 0%, #eee 100%);    /* 背景色をオレンジに指定 */
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;    /* line-heightの半分の角丸を指定 */
   min-width: 20px;        /* 最低幅を指定 */
   padding: 0 3px;         /* 左右に少しだけ余白を設定 */
   box-sizing: border-box; /* 計算しやすいように */
