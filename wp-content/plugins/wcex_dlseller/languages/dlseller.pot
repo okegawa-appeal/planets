@@ -1,0 +1,559 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WCEX DLSeller\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-06-12 00:00+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Collne Inc. <info@collne.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Description of the plugin/theme
+msgid "This plug-in is a download or service content sales extension plug-in dedicated to Welcart. Please use in conjunction with the Welcart e-Commerce."
+msgstr "このプラグインは Welcart 専用のダウンロード販売用拡張プラグインです。Welcart 本体と一緒にご利用ください。"
+
+#. Author of the plugin/theme
+msgid "Collne Inc."
+msgstr "コルネ株式会社"
+
+msgid "DLSeller Setting"
+msgstr "ダウンロード販売設定"
+
+msgid "Setting"
+msgstr "設定"
+
+msgid "DLSeller"
+msgstr "ダウンロード販売"
+
+msgid "Contents directory path"
+msgstr "コンテンツフォルダのパス"
+
+msgid "Please appoint the full path of the directory which contents file is in."
+msgstr "コンテンツファイルが入っているディレクトリのフルパスを指定します。"
+
+msgid "Terms of Use"
+msgstr "利用規約"
+
+msgid "Read Terms and Conditions"
+msgstr "利用規約を読む"
+
+msgid "Agree"
+msgstr "利用規約に同意する"
+
+msgid "Not agree"
+msgstr "利用規約に同意していません"
+
+msgid "Division"
+msgstr "区分"
+
+msgid "Validity(days)"
+msgstr "有効期間（日数）"
+
+msgid "dlValidity(days)"
+msgstr "再ダウンロード有効期間（日数）"
+
+msgid "Re-download validity(days)"
+msgstr "再ダウンロード有効期間（日数）"
+
+msgid "Contract Period(Months)"
+msgstr "契約期間（月数）"
+
+msgid "Release Date"
+msgstr "公開日"
+
+msgid "Release date"
+msgstr "公開日"
+
+msgid "Version"
+msgstr "バージョン"
+
+msgid "Author"
+msgstr "制作"
+
+msgid "Purchases"
+msgstr "購入数"
+
+msgid "Downloads"
+msgstr "ダウンロード数"
+
+msgid "Go to Download Page"
+msgstr "ダウンロードページへ"
+
+msgid "Checkout"
+msgstr "チェックアウト"
+
+msgid "Confirm"
+msgstr "内容確認"
+
+msgid "Purchase"
+msgstr "購入する"
+
+msgid "Redownload"
+msgstr "再ダウンロード"
+
+msgid "Information"
+msgstr "インフォメーション"
+
+msgid "Download"
+msgstr "ダウンロード"
+
+msgid "Data file"
+msgstr "コンテンツファイル"
+
+msgid "Service"
+msgstr "サービス"
+
+msgid "No limit"
+msgstr "無期限"
+
+msgid "Continuation charging information is updated"
+msgstr "継続課金情報を更新しました。"
+
+msgid "Continue Members"
+msgstr "継続課金会員リスト"
+
+msgid "Edit continue member data"
+msgstr "継続課金会員情報"
+
+msgid "Continuation"
+msgstr "継続中"
+
+msgid "continuation"
+msgstr "継続中"
+
+msgid "Cncellation"
+msgstr "停止中"
+
+msgid "Cancellation"
+msgstr "停止中"
+
+msgid "cancellation"
+msgstr "停止中"
+
+msgid "Modified"
+msgstr "更新日"
+
+msgid "2.Login"
+msgstr "ログイン"
+
+msgid "Order ID"
+msgstr "受注ID"
+
+msgid "Member ID"
+msgstr "会員No"
+
+msgid "Name"
+msgstr "氏名"
+
+msgid "Amount"
+msgstr "金額"
+
+msgid "Shipped"
+msgstr "物販"
+
+msgid "You can add only one Monthly Subscription item in your shopping cart."
+msgstr "継続課金対象商品はカートに一つしか入れることができません。カートの商品を入れ替えますか？"
+
+msgid "You can add only one continuation charging item in your shopping cart."
+msgstr "継続課金対象商品はカートに一つしか入れることができません。カートの商品を入れ替えますか？"
+
+msgid "You have Monthly Subscription item in your shopping cart. If you wantto add this item,you have to clear the item in your cart.Is it ok to clear your cart?"
+msgstr "この商品は継続課金対象商品です。この商品をカートに入れる場合は、現在のカートをクリアしなくてはいけません。カートをクリアしてよろしいですか？"
+
+msgid "You have the continuation charging item in your shopping cart. If you want to add this item, you have to clear the item in your cart. Is it ok to clear your cart?"
+msgstr "この商品は継続課金対象商品です。この商品をカートに入れる場合は、現在のカートをクリアしなくてはいけません。カートをクリアしてよろしいですか？"
+
+msgid "This is Monthly Subscription item. If you want to add this item, youhave to clear theitem in your cart. Is it ok to clear your cart?"
+msgstr "現在カートに継続課金対象商品が入っています。この商品をカートに入れる場合は、現在のカートをクリアしなくてはいけません。カートをクリアしてよろしいですか？"
+
+msgid "This is the continuation charging item. If you want to add this item, you have to clear your cart. Is it ok to clear your cart?"
+msgstr "現在カートに継続課金対象商品が入っています。この商品をカートに入れる場合は、現在のカートをクリアしなくてはいけません。カートをクリアしてよろしいですか？"
+
+msgid "Monthly Fee"
+msgstr "月額"
+
+msgid "Semiannual Fee"
+msgstr "半年額"
+
+msgid "Annual Fee"
+msgstr "年額"
+
+msgid "Normal Charging"
+msgstr "通常課金"
+
+msgid "Recurring Subscription"
+msgstr "継続課金"
+
+msgid "Continuation Charging"
+msgstr "継続課金"
+
+msgid "Auto-continuation charging"
+msgstr "自動継続課金"
+
+msgid "Item Code"
+msgstr "商品コード"
+
+msgid "Item Name"
+msgstr "商品名"
+
+msgid "File Name"
+msgstr "ファイル名"
+
+msgid "File name"
+msgstr "ファイル名"
+
+msgid "First Withdrawal Date"
+msgstr "初回課金日"
+
+msgid "Next Withdrawal Date"
+msgstr "次回課金日"
+
+msgid "Renewal Date"
+msgstr "次回契約更新日"
+
+msgid "Contract Period"
+msgstr "ご契約期間"
+
+msgid "You can download it again during your subscription period."
+msgstr "再ダウンロード期間中は会員ページより再ダウンロードが可能です。"
+
+msgid "Month（Automatic Renewal）"
+msgstr "ヶ月（自動更新）"
+
+msgid "Month(Automatic Renewal)"
+msgstr "ヶ月（自動更新）"
+
+msgid "Application Date"
+msgstr "お申込み日"
+
+msgid "Charging Interval"
+msgstr "課金間隔"
+
+msgid "Charging Date"
+msgstr "課金日"
+
+msgid "Condition"
+msgstr "状態"
+
+msgid "Status"
+msgstr "契約"
+
+msgid "Settlement Supplier"
+msgstr "決済会社"
+
+msgid "Limit of Card(Month/Year)"
+msgstr "カード(月/年)"
+
+msgid "Data Error"
+msgstr "データエラー"
+
+msgid "Send Error"
+msgstr "送信エラー"
+
+msgid "Update Request Email"
+msgstr "更新依頼メール"
+
+msgid "Credit card update request"
+msgstr "カード情報更新依頼"
+
+msgid "Credit card update processing"
+msgstr "カード情報更新処理"
+
+msgid "Login is necessary to update Credit card. Please work to update it according to the guidance of the next page if You can log in."
+msgstr "カード情報を更新するにはログインが必要です。<br />ログインできましたら、次のページの案内に従って更新処理を行ってください。"
+
+msgid "The value of the Charging Type is abnormal."
+msgstr "課金タイプの値が異常です。"
+
+msgid "The value of the Charging Interval is abnormal."
+msgstr "課金間隔の値が異常です。"
+
+msgid "The value of the Charging Date is abnormal."
+msgstr "課金日の値が異常です。"
+
+msgid "I contact you by an email if I can confirm the receipt of money."
+msgstr "ご入金が確認できましたらメールにてご連絡させていただきます。"
+
+msgid "After the receipt of money, you can download it from your member page."
+msgstr "ご入金後に会員ページよりダウンロードが可能となります。"
+
+msgid "I am in the dispatch of the product if I can confirm the receipt of money."
+msgstr "ご入金が確認できましたら商品の発送準備に入らせていただきます。"
+
+msgid "Card information update processing was completed. Thank you."
+msgstr "カード情報更新処理が完了いたしました。ありがとうございました。<br />今後ともよろしくお願いいたします。"
+
+msgid "Expired"
+msgstr "有効期限切れ"
+
+msgid "An error occurred. Please contact the manager."
+msgstr "エラーが発生しました。管理者にお問合せください。"
+
+msgid "Download the latest version"
+msgstr "最新版をダウンロード"
+
+msgid "Monthly"
+msgstr "毎月"
+
+msgid "Every six months"
+msgstr "半年毎"
+
+msgid "Every year"
+msgstr "毎年"
+
+msgid "Order date"
+msgstr "受注日"
+
+msgid "*** There is a contract of auto continuation billing."
+msgstr "※継続課金の契約があります。"
+
+msgid "Purchaser limit"
+msgstr "購入者制限"
+
+msgid "Only members"
+msgstr "メンバーのみが購入できる"
+
+msgid "Anyone"
+msgstr "誰でも購入できる"
+
+msgid "Select the \"Only members\", it will be forced to login when put into the cart. <br />The default value is \"Only members\"."
+msgstr "「メンバーのみが購入できる」を選択すると、カートへ投入の際ログインを強要されます。<br />初期値は「メンバーのみが購入できる」です。"
+
+msgid "Member check strengthen"
+msgstr "会員情報チェックの強化"
+
+msgid "Strengthen"
+msgstr "強化する"
+
+msgid "Not strengthen"
+msgstr "強化しない"
+
+msgid "When strengthening, address and phone number is mandatory item. Please select the \"strengthen\" if at settlement performing \"installments\" or \"auto continuation charging\"."
+msgstr "強化すると、住所や電話番号が必須項目となります。<br />決済で「分割払い」や「自動継続課金」を行う場合は「強化する」を選択してください。"
+
+msgid "Actual CSV"
+msgstr "実績CSV"
+
+msgid "Downloads the downloading and the purchase results in CSV format."
+msgstr "ダウンロード及び購入実績数をCSV形式でダウンロードします。"
+
+msgid "Terms of Use for the Continuation charging"
+msgstr "継続課金用の利用規約"
+
+msgid "Transfer rate"
+msgstr "転送レート"
+
+msgid "The initial value is 5000."
+msgstr "初期値は5000です。"
+
+msgid "Order information is different. Please contact the manager."
+msgstr "注文情報が異なります。<br />管理者にお問い合わせください。"
+
+msgid "Update processing of card information has been completed. Thank you."
+msgstr "カード情報の更新処理は完了いたしております。<br />ありがとうございました。今後ともよろしくお願いいたします。"
+
+msgid "Since the transition to the page of the settlement company by clicking the \"Update\", please fill out the information for the new card.<br />In addition, this process is intended to update the card information such as credit card expiration date, it is not in your contract renewal of service.<br />To check the current contract, please refer to the member page."
+msgstr "「更新処理を行う」をクリックしますと決済会社のページが表示されますので、新しいカードの情報をご記入ください。<br />尚、この処理はクレジットカード有効期限などのカード情報を更新するもので、現在ご利用いただいていますサービスのご契約更新ではありません。<br />現在のご契約をご確認いただくには会員ページをご覧ください。"
+
+msgid "Update"
+msgstr "更新処理を行う"
+
+msgid "It is illegal request."
+msgstr "不正な要求です。"
+
+msgid "agree"
+msgstr "同意する"
+
+msgid "days"
+msgstr "日間"
+
+msgid "From payment day for %s days"
+msgstr "ご入金日より %s 日間"
+
+msgid "From %1$s to %2$s"
+msgstr "%1$s ～ %2$s"
+
+msgid "Sorry, can not use the points to the continuation accounting items."
+msgstr "継続課金の商品は、ポイントをご利用いただけません。誠に申し訳ございません。"
+
+msgid "Settlement reminder-email"
+msgstr "課金日通知メール"
+
+msgid "Contract renewal email"
+msgstr "契約更新日通知メール"
+
+msgid "Reminder-email of settlement of the auto continuation charging."
+msgstr "自動継続課金の課金日をお知らせする通知メール。"
+
+msgid "Reminder-email of contract renewal of the auto continuation charging."
+msgstr "自動継続課金の契約更新日をお知らせする通知メール。"
+
+msgid "days before"
+msgstr "日前"
+
+msgid "Reminder-email sent date"
+msgstr "通知メール送信日"
+
+msgid "Send reminder-email to the number of days before. Specified value is 7 days ago."
+msgstr "通知メールを何日前に送信するかを設定します。規定値は7日前です。"
+
+msgid "Guidance of the settlement date"
+msgstr "【課金日のご案内】"
+
+msgid "This e-mail is a guide for the next settlement date of the auto continuation charging."
+msgstr "このメールは、ご契約いただいている継続課金商品の、次回課金日のご案内です。"
+
+msgid "Guidance of the contract renewal date"
+msgstr "【契約更新日のご案内】"
+
+msgid "This e-mail is a guide for the next contract renewal date of the auto continuation charging."
+msgstr "このメールは、ご契約いただいている継続課金商品の、次回契約更新日のご案内です。"
+
+msgid "Send automatically on reminder-email sent date."
+msgstr "指定した通知メール送信日に自動送信されます。"
+
+msgid "(automatic transmission)"
+msgstr "（自動送信）"
+
+msgid "Back to the continue members list"
+msgstr "継続課金会員リストに戻る"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Resumption"
+msgstr "再開"
+
+msgid "Stop the auto continuation charging. Is it OK?"
+msgstr "自動継続課金を停止します。よろしいですか？"
+
+msgid "Resume the auto continuation charging. Is it OK?"
+msgstr "自動継続課金を再開します。よろしいですか？"
+
+msgid "Continuation charging information"
+msgstr "継続課金情報"
+
+msgid "Continuation charging member information"
+msgstr "継続課金会員情報"
+
+msgid "no charge"
+msgstr "無償"
+
+msgid "no payment"
+msgstr "お支払なし"
+
+msgid "Automatic processing execution time"
+msgstr "自動処理の実行時間"
+
+msgid "Reminder-email will be sent to this time."
+msgstr "通知メールを送信する場合、この時間に送信されます。"
+
+msgid "Automatic processing Setting"
+msgstr "自動処理設定"
+
+msgid "Contractor name"
+msgstr "契約者名"
+
+msgid "Next contract renewal date is incorrect."
+msgstr "次回契約更新日の値が不正です。"
+
+msgid "Next settlement date is incorrect."
+msgstr "次回課金日の値が不正です。"
+
+msgid "The next settlement date must be after %s."
+msgstr "次回課金日は %s 以降で指定してください。"
+
+msgid "Credit Card Information Update Request"
+msgstr "クレジットカード情報更新のお願い"
+
+msgid "Thank you very much for using our service."
+msgstr "平素は当サービスをご利用いただき誠にありがとうございます。"
+
+msgid "Please be sure to check this notification because it is an important contact for continued use of the service under contract."
+msgstr "このメールは、ご契約中のサービスの継続ご利用におきましての重要な連絡でございますので必ずお目通しください。"
+
+msgid "Currently registered credit card expiration date is %s, "
+msgstr "現在ご登録のクレジットカードの有効期限は %s となっており、"
+
+msgid "So you keep on this you will not be able to pay next month."
+msgstr "このままですと、来月のお支払いが不履行となってしまいます。"
+
+msgid "So your payment of this month is outstanding payment."
+msgstr "当月のお支払いが不履行となっております。"
+
+msgid "If you have received a new credit card, "
+msgstr "つきましては、お手元に新しいクレジットカードが届いておりましたら、"
+
+msgid "Please click the URL below and update the card information during this month."
+msgstr "今月中に下記の URL をクリックしてカード情報の更新を行なっていただきたいと存じます。"
+
+msgid "Sorry for troubling you, please process it."
+msgstr "大変お手数をおかけ致しますが、何卒よろしくお願いいたします。"
+
+msgid "If the card information update procedure failed, please contact us at the following email address."
+msgstr "尚、カード情報更新手続きがうまくいかなかった場合は、恐れ入りますが下記のメールアドレス宛にご連絡ください。"
+
+msgid "Thank you."
+msgstr "今後ともよろしくお願いいたします。"
+
+msgid "---------------------------------------------------------"
+msgstr "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+msgid "Download Continue Member List"
+msgstr "継続課金会員リスト出力"
+
+msgid "** Contract contents **"
+msgstr "【ご契約内容】"
+
+msgid "Automatic payment settlement is not completed normally."
+msgstr "自動継続課金のお支払いが完了しませんでした。"
+
+msgid "Please click the URL below and update the card information."
+msgstr "下記の URL をクリックしてカード情報の更新を行なっていただきたいと存じます。"
+
+msgid "Method of Payment"
+msgstr "お支払い方法"
+
+msgid "Date charged"
+msgstr "課金時期"
+
+msgid "first time"
+msgstr "初回"
+
+msgid "th"
+msgstr "回目"
+
+msgid "(Payment when the item arrives.)"
+msgstr "（お支払いは商品の到着時になります）"
+
+msgid "(Payment will be automatically settled on the billing date.)"
+msgstr "（お支払いは課金日に自動で決済されます）"
+
+msgid "One payment per month"
+msgstr "毎月1回のお支払い"
+
+msgid "One payment every 6 months"
+msgstr "半年毎に1回のお支払い"
+
+msgid "One payment per year"
+msgstr "毎年1回のお支払い"
+
+msgid "(The contract will continue until the customer requests to stop billing.)"
+msgstr "（ご契約はお客様から課金停止のお申し出があるまで続きます）"
+
+msgid "/"
+msgstr "・"
+
+msgid ","
+msgstr "、"
+
+msgid " included"
+msgstr "込"
+
+msgid "Tax"
+msgstr "税"
+
+msgid "* Billing will continue after the 6th payment."
+msgstr "※6回目以降も継続して課金されます"
