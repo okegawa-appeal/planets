@@ -1076,14 +1076,15 @@ function order_item2cart_ajax() {
 function order_item_ajax() {
 	global $usces;
 
-	if ( 'order_item_ajax' !== $_POST['action'] ) {
+	if ( 'order_item_ajax' !== wp_unslash( $_POST['action'] ) ) {
 		die(0);
 	}
 
 	$res   = false;
 	$_POST = $usces->stripslashes_deep_post( $_POST );
+	$mode  = sanitize_text_field( wp_unslash( $_POST['mode'] ) );
 
-	switch ( $_POST['mode'] ) {
+	switch ( $mode ) {
 		case 'completionMail':
 		case 'orderConfirmMail':
 		case 'changeConfirmMail':
@@ -1091,16 +1092,19 @@ function order_item_ajax() {
 		case 'mitumoriConfirmMail':
 		case 'cancelConfirmMail':
 		case 'otherConfirmMail':
-			$res = usces_order_confirm_message( $_POST['order_id'] );
+			$order_id = (int) wp_unslash( $_POST['order_id'] );
+			$res      = usces_order_confirm_message( $order_id );
 			break;
 		case 'sendmail':
 			$res = usces_ajax_send_mail();
 			break;
 		case 'get_order_item':
-			$res = get_order_item( $_POST['itemcode'] );
+			$itemcode = sanitize_text_field( wp_unslash( $_POST['itemcode'] ) );
+			$res      = get_order_item( $itemcode );
 			break;
 		case 'get_item_select_option':
-			$res = usces_get_item_select_option( $_POST['cat_id'] );
+			$cat_id = (int) wp_unslash( $_POST['cat_id'] );
+			$res    = usces_get_item_select_option( $cat_id );
 			break;
 		case 'ordercheckpost':
 			$res = usces_update_ordercheck();
@@ -1109,24 +1113,31 @@ function order_item_ajax() {
 			$res = usces_get_member_neworder();
 			break;
 		case 'recalculation':
-			$change_taxrate = ( isset( $_POST['change_taxrate'] ) ) ? $_POST['change_taxrate'] : '';
-			$res            = usces_order_recalculation( $_POST['order_id'], $_POST['mem_id'], $_POST['post_ids'], $_POST['prices'], $_POST['quants'], $_POST['cart_ids'], $_POST['upoint'], $_POST['shipping_charge'], $_POST['cod_fee'], $_POST['discount'], $change_taxrate );
+			$change_taxrate = ( isset( $_POST['change_taxrate'] ) ) ? sanitize_text_field( wp_unslash( $_POST['change_taxrate'] ) ) : '';
+			$order_id       = (int) wp_unslash( $_POST['order_id'] );
+			$mem_id         = (int) wp_unslash( $_POST['mem_id'] );
+			$res            = usces_order_recalculation( $order_id, $mem_id, $_POST['post_ids'], $_POST['prices'], $_POST['quants'], $_POST['cart_ids'], $_POST['upoint'], $_POST['shipping_charge'], $_POST['cod_fee'], $_POST['discount'], $change_taxrate );
 			break;
 		case 'recalculation_reduced':
-			$change_taxrate = ( isset( $_POST['change_taxrate'] ) ) ? $_POST['change_taxrate'] : '';
-			$res            = usces_order_recalculation_reduced( $_POST['order_id'], $_POST['mem_id'], $_POST['post_ids'], $_POST['prices'], $_POST['quants'], $_POST['cart_ids'], $_POST['upoint'], $_POST['shipping_charge'], $_POST['cod_fee'], $_POST['discount_standard'], $_POST['discount_reduced'], $change_taxrate );
+			$change_taxrate = ( isset( $_POST['change_taxrate'] ) ) ? sanitize_text_field( wp_unslash( $_POST['change_taxrate'] ) ) : '';
+			$order_id       = (int) wp_unslash( $_POST['order_id'] );
+			$mem_id         = (int) wp_unslash( $_POST['mem_id'] );
+			$res            = usces_order_recalculation_reduced( $order_id, $mem_id, $_POST['post_ids'], $_POST['prices'], $_POST['quants'], $_POST['cart_ids'], $_POST['upoint'], $_POST['shipping_charge'], $_POST['cod_fee'], $_POST['discount_standard'], $_POST['discount_reduced'], $change_taxrate );
 			break;
 		case 'get_settlement_log':
 			$res = usces_get_settlement_log();
 			break;
 		case 'get_settlement_log_detail':
-			$res = usces_get_settlement_log_detail( $_POST['log_key'] );
+			$log_key = sanitize_text_field( wp_unslash( $_POST['log_key'] ) );
+			$res     = usces_get_settlement_log_detail( $log_key );
 			break;
 		case 'search_settlement_log':
-			$res = usces_get_settlement_log( $_POST['log_key'] );
+			$log_key = sanitize_text_field( wp_unslash( $_POST['log_key'] ) );
+			$res     = usces_get_settlement_log( $log_key );
 			break;
 		case 'delete_settlement_log':
-			usces_delete_settlement_log( $_POST['log_key'] );
+			$log_key = sanitize_text_field( wp_unslash( $_POST['log_key'] ) );
+			usces_delete_settlement_log( $log_key );
 			$res = usces_get_settlement_log();
 			break;
 		case 'delete_settlement_log_all':
@@ -1134,16 +1145,20 @@ function order_item_ajax() {
 			$res = usces_get_settlement_log();
 			break;
 		case 'revival_order_data':
-			$res = usces_revival_order_data( $_POST['log_key'], $_POST['register_date'] );
+			$log_key       = sanitize_text_field( wp_unslash( $_POST['log_key'] ) );
+			$register_date = sanitize_text_field( wp_unslash( $_POST['register_date'] ) );
+			$res           = usces_revival_order_data( $log_key, $register_date );
 			break;
 		case 'get_settlement_error_log':
 			$res = usces_get_settlement_error_log();
 			break;
 		case 'get_settlement_error_log_detail':
-			$res = usces_get_settlement_error_log_detail( $_POST['log_id'] );
+			$log_id = sanitize_text_field( wp_unslash( $_POST['log_id'] ) );
+			$res    = usces_get_settlement_error_log_detail( $log_id );
 			break;
 		case 'delete_settlement_error_log':
-			usces_delete_settlement_error_log( $_POST['log_id'] );
+			$log_id = sanitize_text_field( wp_unslash( $_POST['log_id'] ) );
+			usces_delete_settlement_error_log( $log_id );
 			$res = usces_get_settlement_error_log();
 			break;
 		case 'delete_settlement_error_log_all':

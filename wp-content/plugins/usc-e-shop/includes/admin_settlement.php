@@ -8,8 +8,9 @@
 // $opts                 = $this->options['acting_settings'];
 $openssl              = extension_loaded( 'openssl' );
 $curl                 = extension_loaded( 'curl' );
-$available_settlement = get_option( 'usces_available_settlement' );
-$settlement_selected  = get_option( 'usces_settlement_selected' );
+$available_settlement = get_option( 'usces_available_settlement', array() );
+$settlement_selected  = get_option( 'usces_settlement_selected', array() );
+$post_data            = wp_unslash( $_POST );
 ?>
 <script type="text/javascript">
 jQuery( function($) {
@@ -60,7 +61,7 @@ jQuery( function($) {
 			</div>
 			<ul class="settlement-ui-sortable" id="available-settlement">
 			<?php foreach ( (array) $available_settlement as $key => $name ) : ?>
-				<?php if ( ! in_array( $key, (array) $settlement_selected ) ) : ?>
+				<?php if ( ! in_array( $key, (array) $settlement_selected, true ) ) : ?>
 				<li class="ui-available-settlement" id="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $name ); ?></li>
 				<?php endif; ?>
 			<?php endforeach; ?>
@@ -77,14 +78,14 @@ jQuery( function($) {
 			<?php endforeach; ?>
 		<?php endif; ?>
 			</ul>
-			<?php if ( isset( $_POST['acting'] ) && 'settlement_selected' == $_POST['acting'] ) : ?>
+			<?php if ( isset( $post_data['acting'] ) && 'settlement_selected' === $post_data['acting'] ) : ?>
 				<?php if ( '' != $mes ) : ?>
 				<div class="error_message"><?php wel_esc_script_e( $mes ); ?></div>
 				<?php endif; ?>
 			<?php endif; ?>
 			<div class="settlement-selected-footer">
 				<input name="acting" type="hidden" value="settlement_selected" />
-				<input name="settlement_selected" id="settlement-selected-update" type="hidden" value="<?php echo implode( ',', (array) $settlement_selected ); ?>" />
+				<input name="settlement_selected" id="settlement-selected-update" type="hidden" value="<?php echo esc_attr( implode( ',', (array) $settlement_selected ) ); ?>" />
 				<input name="usces_option_update" type="submit" class="button button-primary" value="<?php esc_attr_e( 'Update the modules to use', 'usces' ); ?>" />
 				<?php wp_nonce_field( 'admin_settlement', 'wc_nonce' ); ?>
 			</div>

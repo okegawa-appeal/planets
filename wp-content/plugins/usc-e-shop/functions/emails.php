@@ -23,6 +23,10 @@ function usces_order_confirm_message( $order_id ) {
 	global $usces;
 
 	$data = $usces->get_order_data( $order_id, 'direct' );
+	if ( empty( $data ) ) {
+		return '';
+	}
+
 	$deli = unserialize( $data['order_delivery'] );
 	$cart = usces_get_ordercartdata( $order_id );
 
@@ -1456,7 +1460,7 @@ function usces_upload_file_attach( $file, $folder_move ) {
 function usces_check_validate_attach_file( $file ) {
 	global $usces;
 
-	$email_attach_file_extension = ( ! empty( $usces->options['email_attach_file_extension'] ) ) ? explode( ',', strtolower( $usces->options['email_attach_file_extension'] ) ) : array();
+	$email_attach_file_extension = wel_email_attach_file_extension( explode( ',', strtolower( $usces->options['email_attach_file_extension'] ) ) );
 	$email_attach_file_size      = (int) $usces->options['email_attach_file_size'];
 	$err_max_file_size           = false;
 	$err_max_file_extension      = false;
@@ -2708,4 +2712,31 @@ function usces_mail_tax( $data ) {
 	$tax_str = apply_filters( 'usces_filter_mail_tax', $tax_str );
 
 	return wel_esc_script( $tax_str );
+}
+
+/**
+ * Attachable Attachment File Extension
+ *
+ * @param array $email_attach_file_extensions Setting values.
+ * @return array
+ */
+function wel_email_attach_file_extension( $email_attach_file_extensions ) {
+	if ( empty( $email_attach_file_extensions ) || ! is_array( $email_attach_file_extensions ) ) {
+		$email_attach_file_extension = array( 'jpg', 'png', 'pdf' );
+	} else {
+		$email_attach_file_extension = array();
+
+		$allowed_extensions = array_keys( get_allowed_mime_types() );
+		$extensions         = array();
+		foreach ( $allowed_extensions as $extension ) {
+			$extensions = array_merge( $extensions, explode( '|', $extension ) );
+		}
+		foreach ( (array) $email_attach_file_extensions as $extension ) {
+			if ( in_array( $extension, $extensions, true ) ) {
+				$email_attach_file_extension[] = $extension;
+			}
+		}
+	}
+
+	return $email_attach_file_extension;
 }

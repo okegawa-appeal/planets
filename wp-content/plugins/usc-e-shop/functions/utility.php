@@ -1682,3 +1682,17 @@ function filter_input_array_recursive( $type, array $filters ) {
 	}
 	return $ret;
 }
+
+/**
+ * Remove the path from the uploaded file name and perform escape processing.
+ *
+ * @param string $file_name File Name.
+ *
+ * @return string
+ */
+function wel_esc_upload_file_name( $file_name ) {
+	$filenames = explode( '/', urldecode( $file_name ) );
+	end( $filenames );
+
+	return wel_esc_script( $filenames[0] );
+}

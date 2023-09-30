@@ -31,7 +31,9 @@ get_header();
 								<li><?php esc_html_e( 'The items marked with *, are mandatory. Please complete.', 'usces' ); ?></li>
 								<li><?php esc_html_e( 'Please use Alphanumeric characters for numbers.', 'usces' ); ?></li>
 							</ul>
-							<?php do_action( 'usces_action_newmember_page_header' ); ?>
+							<br/>
+							
+							<font color="red"><?php do_action( 'usces_action_newmember_page_header' ); ?></font>
 						</div><!-- .header_explanation -->
 
 						<div class="error_message"><?php usces_error_message(); ?></div>

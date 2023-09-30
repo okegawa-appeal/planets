@@ -947,6 +947,8 @@ class usc_e_shop
 			check_admin_referer( 'admin_mail', 'wc_nonce' );
 			$_POST = $this->stripslashes_deep_post( $_POST );
 
+			$email_attach_file_extension = wel_email_attach_file_extension( explode( ',', trim( wel_esc_script( $_POST['email_attach_file_extension'] ) ) ) );
+
 			$this->options['smtp_hostname']               = esc_html( trim( $_POST['smtp_hostname'] ) );
 			$this->options['newmem_admin_mail']           = (int) $_POST['newmem_admin_mail'];
 			$this->options['updmem_admin_mail']           = (int) $_POST['updmem_admin_mail'];
@@ -955,7 +957,7 @@ class usc_e_shop
 			$this->options['delmem_customer_mail']        = (int) $_POST['delmem_customer_mail'];
 			$this->options['put_customer_name']           = (int) $_POST['put_customer_name'];
 			$this->options['email_attach_feature']        = (int) $_POST['email_attach_feature'];
-			$this->options['email_attach_file_extension'] = trim( wel_esc_script( $_POST['email_attach_file_extension'] ) );
+			$this->options['email_attach_file_extension'] = implode( ',', $email_attach_file_extension );
 			$this->options['email_attach_file_size']      = (int) $_POST['email_attach_file_size'];
 			$this->options['add_html_email_option']       = (int) $_POST['add_html_email_option'];
 			update_option( 'usces', $this->options );
@@ -1510,7 +1512,7 @@ class usc_e_shop
 			switch ( $_POST['acting'] ) {
 				case 'settlement_selected':
 					if ( isset( $_POST['settlement_selected'] ) ) {
-						$settlement_selected = explode( ',', $_POST['settlement_selected'] );
+						$settlement_selected = explode( ',', sanitize_text_field( wp_unslash( $_POST['settlement_selected'] ) ) );
 						$payments            = usces_get_system_option( 'usces_payment_method', 'settlement' );
 						$acting_payments     = array();
 						foreach ( (array) $payments as $key => $payment ) {
@@ -1524,7 +1526,13 @@ class usc_e_shop
 							}
 						}
 						$acting_payments      = array_unique( $acting_payments );
-						$available_settlement = get_option( 'usces_available_settlement' );
+						$available_settlement = get_option( 'usces_available_settlement', array() );
+						$available            = array_keys( $available_settlement );
+						foreach ( (array) $settlement_selected as $settlement ) {
+							if ( ! empty( $settlement ) && ! in_array( $settlement, $available ) ) {
+								$mes .= __( '* Failed to update payment module.', 'usces' ) . '<br />';
+							}
+						}
 						foreach ( (array) $acting_payments as $payment ) {
 							if ( ! in_array( $payment, $settlement_selected ) ) {
 								$settlement_name = $available_settlement[ $payment ];
@@ -1533,7 +1541,7 @@ class usc_e_shop
 						}
 						if ( WCUtils::is_blank( $mes ) ) {
 							$unavailable_activate = 0;
-							$unavailable_payments = apply_filters( 'usces_filter_unavailable_payments', get_option( 'usces_unavailable_settlement' ) );
+							$unavailable_payments = apply_filters( 'usces_filter_unavailable_payments', get_option( 'usces_unavailable_settlement', array() ) );
 							foreach ( (array) $unavailable_payments as $payment ) {
 								if ( in_array( $payment, $settlement_selected ) ) {
 									$unavailable_activate++;
@@ -5609,7 +5617,7 @@ class usc_e_shop
 				KEY acc_date ( acc_date ), 
 				KEY acc_num1 ( acc_num1 ), 
 				KEY acc_num2 ( acc_num2 )  
-				) AUTO_INCREMENT=0 ROW_FORMAT=DYNAMIC $charset_collate;";
+				) AUTO_INCREMENT=0 $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_access", USCES_DB_ACCESS);
@@ -5641,7 +5649,7 @@ class usc_e_shop
 				PRIMARY KEY (`ID`),
 				KEY mem_email ( mem_email ) ,  
 				KEY mem_pass ( mem_pass )  
-				) AUTO_INCREMENT=1000 ROW_FORMAT=DYNAMIC $charset_collate;";
+				) AUTO_INCREMENT=1000 $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_member", USCES_DB_MEMBER);
@@ -5656,7 +5664,7 @@ class usc_e_shop
 				PRIMARY KEY  (mmeta_id),
 				KEY order_id (member_id),
 				KEY meta_key (meta_key(191))
-				) ROW_FORMAT=DYNAMIC $charset_collate;";
+				) $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_member_meta", USCES_DB_MEMBER_META);
@@ -5706,7 +5714,7 @@ class usc_e_shop
 				KEY order_address1 ( order_address1 ) ,  
 				KEY order_tel ( order_tel ) ,  
 				KEY order_date ( order_date )  
-				) AUTO_INCREMENT=1000 ROW_FORMAT=DYNAMIC $charset_collate;";
+				) AUTO_INCREMENT=1000 $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_order", USCES_DB_ORDER);
@@ -5721,7 +5729,7 @@ class usc_e_shop
 				PRIMARY KEY  (ometa_id),
 				KEY order_id (order_id),
 				KEY meta_key (meta_key(191))
-				) ROW_FORMAT=DYNAMIC $charset_collate;";
+				) $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_order_meta", USCES_DB_ORDER_META);
@@ -5754,7 +5762,7 @@ class usc_e_shop
 				KEY  `item_name` (  `item_name`(191)  ) ,
 				KEY  `sku_code` (  `sku_code`  ) ,
 				KEY  `sku_name` (  `sku_name`(191)  ) 
-				) AUTO_INCREMENT=1000 ROW_FORMAT=DYNAMIC $charset_collate;";
+				) AUTO_INCREMENT=1000 $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_ordercart", USCES_DB_ORDERCART);
@@ -5770,7 +5778,7 @@ class usc_e_shop
 				PRIMARY  KEY (  `cartmeta_id`  ) ,
 				KEY  `cart_id` (  `cart_id`  ) ,
 				KEY  `meta_key` (  `meta_key`(191)  ) 
-				) ROW_FORMAT=DYNAMIC $charset_collate;";
+				) $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_ordercart_meta", USCES_DB_ORDERCART_META);
@@ -5787,7 +5795,7 @@ class usc_e_shop
 				KEY datetime ( datetime ),
 				KEY log_type ( log_type ),
 				KEY log_key ( log_key(191) )
-				) ROW_FORMAT=DYNAMIC $charset_collate;";
+				) $charset_collate;";
 
 			dbDelta($sql);
 			add_option("usces_db_log", USCES_DB_LOG);
@@ -5808,7 +5816,7 @@ class usc_e_shop
 				KEY `order_id` (`order_id`),
 				KEY `tracking_id` (`tracking_id`),
 				KEY `history_key` (`order_id`,`tracking_id`)
-				) ROW_FORMAT=DYNAMIC $charset_collate;";
+				) $charset_collate;";
 			dbDelta( $sql );
 			add_option( "usces_db_acting_log", USCES_DB_ACTING_LOG );
 		}
@@ -5861,7 +5869,7 @@ class usc_e_shop
 				PRIMARY KEY (`post_id`),
 				KEY itemCode ( itemCode ) ,  
 				KEY itemName ( itemName )  
-				) ROW_FORMAT=DYNAMIC ' . $charset_collate . ';';
+				) ' . $charset_collate . ';';
 
 			dbDelta( $sql );
 			add_option( "usces_db_item", USCES_DB_ITEM );
@@ -5893,7 +5901,7 @@ class usc_e_shop
 				KEY name ( name ) ,  
 				KEY price ( price ) ,  
 				KEY paternkey ( paternkey )  
-				) ROW_FORMAT=DYNAMIC ' . $charset_collate . ';';
+				) ' . $charset_collate . ';';
 
 			dbDelta( $sql );
 			add_option( "usces_db_skus", USCES_DB_SKUS );
@@ -5914,7 +5922,7 @@ class usc_e_shop
 				KEY post_id ( post_id ) ,  
 				KEY code ( code ) ,  
 				KEY name ( name ) 
-				) ROW_FORMAT=DYNAMIC ' . $charset_collate . ';';
+				) ' . $charset_collate . ';';
 
 			dbDelta( $sql );
 			add_option( "usces_db_opts", USCES_DB_OPTS );
@@ -5932,7 +5940,7 @@ class usc_e_shop
 				`data` longblob DEFAULT NULL,
 				`datetime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 				 PRIMARY KEY (`ID`)
-				) ROW_FORMAT=DYNAMIC " . $charset_collate . ';';
+				) " . $charset_collate . ';';
 
 			dbDelta( $sql );
 			add_option( "usces_db_admin_log", USCES_DB_ADMIN_LOG );

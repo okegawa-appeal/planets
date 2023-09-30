@@ -56,6 +56,7 @@
 	border-top: 1px solid #ccc;
 	width: 100%;
 	float: right;
+  margin-top: 20px;
 }
 
 /*---- itemcode ---*/
@@ -232,7 +233,7 @@
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 	font-family: FontAwesome;
 	font-weight: bold;
@@ -541,7 +542,7 @@ div.cart_navi li.current::after {
 .send input.to_deliveryinfo_button,
 .send input.to_confirm_button,
 .send input#purchase_button {
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
@@ -825,7 +826,7 @@ div.footer_explanation {
 
 #wc_customer .send input.to_reganddeliveryinfo_button {
 	margin-top: .714286em;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
@@ -1149,7 +1150,7 @@ div.footer_explanation {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 	text-decoration: none;
 }
@@ -1182,7 +1183,7 @@ div.footer_explanation {
 }
 
 .member-page .send input {
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
@@ -1232,13 +1233,13 @@ div.footer_explanation {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
 #wc_login .loginbox #member_login:hover,
 #wc_member .loginbox #member_login:hover {
-	background-color: #ffa500;
+	background: #ffaa00;
 }
 
 #wc_login .loginbox .new-entry,
@@ -1266,13 +1267,13 @@ div.footer_explanation {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
 #wc_login .loginbox .new-entry #nav a:hover,
 #wc_member .loginbox .new-entry #nav a:hover {
-	background-color: #ffa500;
+	background: #ffaa00;
 	text-decoration: none;
 }
 
@@ -1332,7 +1333,7 @@ wc_changepassword .whitebox {
 	-o-transition: .3s ease all;
 	transition: .3s ease all;
 	border: none;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
@@ -1385,7 +1386,7 @@ wc_changepassword .whitebox {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
@@ -1714,7 +1715,7 @@ wc_changepassword .whitebox {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 	text-decoration: none;
 }

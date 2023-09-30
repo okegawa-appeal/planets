@@ -10,10 +10,12 @@ Version: 1.0.0
 	padding: 0 20px;
 }
 .content-title{
-	margin:30px 0;
-	font-size:36px;
+	margin-top:96px;
+	margin-bottom:48px;
+	font-size:64px;
 	font-weight: bold;
 	line-height: 1.0;
+	text-align:center;
 }
 .category-container {
   margin:20px 0 10px;
@@ -21,6 +23,16 @@ Version: 1.0.0
   box-sizing: border-box;
   flex-wrap: wrap;
   font-size:0;
+  justify-content: space-between;
+}
+.category-container::after,
+.category-container::before {
+  display: block;
+  width: 280px;
+  content: "";
+}
+.category-container::before {
+  order: 1;
 }
 .category-container li{
   display: list-item;
@@ -35,18 +47,38 @@ Version: 1.0.0
 }
 .category-container .category-item {
   width: 280px;
-	height: auto;
-	margin-right: 26px;
-	margin-bottom: 30px;
+  height: auto;
+  /* margin-right: 26px; */
+  margin-bottom: 50px;
   position: relative; /* 基準値とする */
-	display: flex;
-	align-items: stretch;
+  display: flex;
+  align-items: stretch;
 }
 .category-container .category-item:nth-child(4n) {
 	margin-right: 0;
 }
 .category-container .category-item a {
 	width: 100%;
+}
+.category-image{
+	width:100%;
+	object-fit: cover;
+}
+.category-title{
+  color:#000;
+  font-size: 16px;
+  padding: 4px 16px 8px ;
+}
+.category-actor{
+  color:#000;
+  font-weight:500;
+  font-size: 16px;
+  padding: 8px 16px 4px;
+}
+.category-start{
+  color:#999;
+  font-size: 14px;
+  padding: 4px 16px 4px;
 }
 .category-container .category-item span.reserve{
   position: absolute;     /* 相対位置に指定 */
@@ -56,8 +88,8 @@ Version: 1.0.0
   font-weight: bold;      /* 太文字にする */
   line-height: 40px;      /* 行の高さを指定 */
   text-align: center;     /* 文字を中央揃えにする */
-  background: linear-gradient(220.55deg, #00f5ff 0%, #0000ff 100%);    /* 背景色をオレンジに指定 */
-  width: 40px;
+  background: #ffdd88;    /* 背景色をオレンジに指定 */
+  width: 60px;
   height: 40px;
   border-radius: 20px;    /* line-heightの半分の角丸を指定 */
   min-width: 20px;        /* 最低幅を指定 */
@@ -72,7 +104,7 @@ Version: 1.0.0
   font-weight: bold;      /* 太文字にする */
   line-height: 40px;      /* 行の高さを指定 */
   text-align: center;     /* 文字を中央揃えにする */
-  background: linear-gradient(220.55deg, #FFF500 0%, #ff0000 100%);    /* 背景色をオレンジに指定 */
+  background: #ffaa00;    /* 背景色をオレンジに指定 */
   width: 60px;
   height: 40px;
   border-radius: 20px;    /* line-heightの半分の角丸を指定 */
@@ -88,8 +120,8 @@ Version: 1.0.0
   font-weight: bold;      /* 太文字にする */
   line-height: 40px;      /* 行の高さを指定 */
   text-align: center;     /* 文字を中央揃えにする */
-  background: linear-gradient(220.55deg, #aaa 0%, #eee 100%);    /* 背景色をオレンジに指定 */
-  width: 40px;
+  background: #aaa;    /* 背景色をオレンジに指定 */
+  width: 60px;
   height: 40px;
   border-radius: 20px;    /* line-heightの半分の角丸を指定 */
   min-width: 20px;        /* 最低幅を指定 */
@@ -136,46 +168,59 @@ Version: 1.0.0
   width:600px;
   margin: 0;
 }
-.category-image{
-	width:100%;
-	object-fit: cover;
+.planets-header{
+	display: flex;
+    align-items: baseline;
 }
-
-.category-title{
-  color:#222;
-  font-weight:500;
-  -webkit-line-clamp: 2;
-	font-size: 16px;
-	padding: 10px;
-}
-
 .drag-list{
   background-color:#fff;
 }
-@media screen and (max-width:767px) {
-  .category-container .category-item {
+
+td.column-description {
+	display:none;
+}
+.announce_container{
+    display: flex; 	
+    flex-wrap: wrap;
+	margin-bottom:100px;
+}
+.announce_container .announce_news{
     width: 100%;
-		margin-right: 0;
-  }
-  .categorypage-container .categorypage-image {
-    width:100%;
-    float:none;
-    display: block;
-  }
-	.categorypage-container .categorypage-description {
-		margin-top: 10px;
-	}
-	.footer_container {
-		padding: 30px 20px;
-	}
-	.footer_container .menu {
-		display: block;
-	}
-	.footer_container .menu li:not(:last-child){
-	margin-bottom: 10px;
-	}
+	margin-bottom:10px;
+}
+.announce_container .announce_twitter{
+    width: 100%;
+	margin-bottom:10px;
+}
+.announce_container .announce_news ul li{
+	background-color:#fff;
+	padding:20px;
+	margin-bottom:5px;
+}
+.announce_container .announce_news ul li .announce_news_date{
+    font-size: .625rem;
+    color: var(--color-pinkish-gray);
+}
+.announce_container .announce_news ul li .announce_news_title{
+	font-size:1rem;
+}
+@media (min-width: 800px) {
+.announce_container .announce_news{
+	width:45%;
+	margin-right:10px;
+}
+.announce_container .announce_twitter{
+	width:45%;
+}
 }
 
+@media (max-width: 999px) {
+.categorypage-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+}
 /* =Reset
 -------------------------------------------------------------- */
 
@@ -656,7 +701,7 @@ input[type="file"] {
 header {
 	position: relative;
 	width: 100%;
-	padding: 30px 0;
+	padding: 20px 0;
 }
 
 header .inner {
@@ -845,7 +890,7 @@ div.site-title a {
 
 h1.site-title img,
 div.site-title img {
-  width: 220px;
+  width: 200px;
   display: block;
 }
 
@@ -1153,7 +1198,7 @@ header #site-navigation input#panel.on-off:checked + div.header-nav-container {
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;
 	border-radius: 0;
-	background-color: #ff8c00;
+  background: #ffaa00;
 	color: #fff;
 }
 
@@ -1212,7 +1257,7 @@ header #site-navigation input#panel.on-off:checked + div.header-nav-container {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background-color: #ff8c00;
+	background: #ffaa00
 	color: #fff;
 	font-size: 14px;
 }
@@ -1910,13 +1955,13 @@ footer nav li li li::before {
 
 .entry-content input[type="submit"],
 .item-description input[type="submit"] {
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
 .entry-content input[type="submit"]:hover,
 .item-description input[type="submit"]:hover {
-	background-color: #ffa500;
+	background: #ffaa00;
 }
 
 /* ———————— Gutenberg ———————— */
@@ -2145,12 +2190,12 @@ footer nav li li li::before {
 }
 
 .inqbox .send input {
-	background-color: #ff8c00;
+	background: #ffaa00;
 	color: #fff;
 }
 
 .inqbox .send input:hover {
-	background-color: #ffa500;
+	background: #ffaa00;
 }
 
 
@@ -2321,6 +2366,64 @@ footer nav li li li::before {
 }
 
 
+
+/* media
+-------------------------------------------------------------- */
+
+
+@media screen and (max-width:1199px){
+
+}
+
+@media screen and (max-width:899px) {
+  .category-container {
+    justify-content: center;
+  }
+  .category-container .category-item:nth-child(odd) {
+    margin-right: 10px;
+  }
+  .category-container .category-item:nth-child(even) {
+    margin-left: 10px;
+  }
+  .categorypage-container .categorypage-image {
+    width:620;
+    height: auto;
+    float:none;
+    display: block;
+  }
+	.categorypage-container .categorypage-description {
+		margin-top: 10px;
+	}
+	.footer_container {
+		padding: 30px 20px;
+	}
+	.footer_container .menu {
+		display: block;
+	}
+	.footer_container .menu li:not(:last-child){
+	margin-bottom: 10px;
+	}
+}
+
+@media screen and (max-width:619px) {
+
+  .category-container {
+    justify-content: space-between;
+  }
+  .category-container .category-item {
+    width: 48%;
+	margin-right: 0 !important;
+    margin-left: 0;
+  }
+  .categorypage-container .categorypage-image {
+    width:100%;
+    height: auto;
+    float:none;
+    display: block;
+  }
+
+}
+
 /**
  * 16.1 Mobile Large 620px
  */
@@ -2330,14 +2433,13 @@ footer nav li li li::before {
 	/* =Base
 	-------------------------------------------------------------- */
 
-
 	textarea {
 		width: 60%;
 	}
 
 	h1.site-title img,
 	div.site-title img {
-		width: 280px;
+		width: 200px;
 	}
 
 	#toTop {
@@ -2474,8 +2576,9 @@ footer nav li li li::before {
 	}
 
 	.content-title{
-		margin:40px 0;
-		font-size:48px;
+		margin:96px 0 48px;
+		font-size:60px;
+		text-align:center;
 	}
 
 	.category-container {
@@ -2506,11 +2609,11 @@ footer nav li li li::before {
 
 }
 
-
 /**
  * 16.2 Tablet Small 740px
  */
 @media screen and (min-width: 46.25em) {
+
 
 
 	body {
@@ -2552,12 +2655,12 @@ footer nav li li li::before {
 	}
 
 	.inqbox .send input {
-		background-color: #ff8c00;
+		background: #ffaa00;
 		color: #fff;
 	}
 
 	.inqbox .send input:hover {
-		background-color: #ffa500;
+		background: #ffaa00;
 	}
 
 
@@ -2634,10 +2737,10 @@ footer nav li li li::before {
 	header .inner {
 		display: flex;
 		flex-wrap: wrap;
-		width: 1200px;
 		margin: 0 auto;
 		align-items: center;
 		padding: 0;
+		width:1200px;
 	}
 
 	/* -- .site-description -- */
@@ -2754,7 +2857,7 @@ footer nav li li li::before {
 
 	/* -- .incart-btn -- */
 	.incart-btn {
-		min-width: 160px;
+		min-width: 140px;
 		margin-top: .714286em;
 		float: right;
 		clear: both;
@@ -2766,7 +2869,7 @@ footer nav li li li::before {
 		-moz-transition: .3s ease all;
 		-o-transition: .3s ease all;
 		transition: .3s ease all;
-		background: linear-gradient(220.55deg, #FFF500 0%, #ff0000 100%);
+		background: #ffaa00;
 		text-align: center;
 	}
 

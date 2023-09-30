@@ -141,18 +141,6 @@ usces_delivery_info_script();
 							</table>
 						<?php endif; ?>
 
-						<table class="customer_form" id="notes_table">
-							<tr>
-								<?php $entry_order_note = ( empty( $usces_entries['order']['note'] ) ) ? apply_filters( 'usces_filter_default_order_note', null ) : $usces_entries['order']['note']; ?>
-								<th scope="row">
-									<?php esc_html_e( 'Notes', 'usces' ); ?>
-								</th>
-								<td colspan="2">
-									<textarea name="offer[note]" id="note" class="notes"><?php echo esc_html( $entry_order_note ); ?></textarea>
-								</td>
-							</tr>
-						</table>
-
 						<div class="send">
 							<input name="offer[cus_id]" type="hidden" value="" />
 							<input name="backCustomer" type="submit" class="back_to_customer_button" value="<?php esc_attr_e( 'Back', 'usces' ); ?>"<?php echo apply_filters( 'usces_filter_deliveryinfo_prebutton', null ); // phpcs:ignore ?> />&nbsp;&nbsp;

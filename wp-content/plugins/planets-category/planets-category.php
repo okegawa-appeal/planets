@@ -37,10 +37,10 @@ add_action('admin_menu', function(){
 	// メインメニュー①
 	//---------------------------------	
     add_menu_page(
-		'Planets Event' // ページのタイトルタグ<title>に表示されるテキスト
-		, 'Planets Event'   // 左メニューとして表示されるテキスト
+		'TOP画面' // ページのタイトルタグ<title>に表示されるテキスト
+		, 'TOP画面'   // 左メニューとして表示されるテキスト
 		, 'manage_options'       // 必要な権限 manage_options は通常 administrator のみに与えられた権限
-		, 'planetsevent'        // 左メニューのスラッグ名 →URLのパラメータに使われる /wp-admin/admin.php?page=toriaezu_menu
+		, 'planetsevententry'        // 左メニューのスラッグ名 →URLのパラメータに使われる /wp-admin/admin.php?page=toriaezu_menu
 		, 'planets_event_entry_page_contents' // メニューページを表示する際に実行される関数(サブメニュー①の処理をする時はこの値は空にする)
 		, 'dashicons-category'       // メニューのアイコンを指定 https://developer.wordpress.org/resource/dashicons/#awards
 		, 3.1                             // メニューが表示される位置のインデックス(0が先頭) 5=投稿,10=メディア,20=固定ページ,25=コメント,60=テーマ,65=プラグイン,70=ユーザー,75=ツール,80=設定
@@ -50,7 +50,7 @@ add_action('admin_menu', function(){
 	// サブメニュー① ※事実上の親メニュー
 	//---------------------------------
 	add_submenu_page(
-		'planetsevent'    // 親メニューのスラッグ
+		'planetsevententry'    // 親メニューのスラッグ
 		, 'DLコンテンツ' // ページのタイトルタグ<title>に表示されるテキスト
 		, 'DLコンテンツ' // サブメニューとして表示されるテキスト
 		, 'manage_options' // 必要な権限 manage_options は通常 administrator のみに与えられた権限
@@ -63,7 +63,7 @@ add_action('admin_menu', function(){
 	// サブメニュー②
 	//---------------------------------
 	add_submenu_page(
-		'planetsevent'    // 親メニューのスラッグ
+		'planetsevententry'    // 親メニューのスラッグ
 		, 'くじ引き商品設定' // ページのタイトルタグ<title>に表示されるテキスト
 		, 'くじ引き商品設定' // サブメニューとして表示されるテキスト
 		, 'manage_options' // 必要な権限 manage_options は通常 administrator のみに与えられた権限
@@ -79,18 +79,23 @@ add_action('admin_menu', function(){
 //=================================================
 
 // データを追加
-function ev_insert_data($id, $title, $url, $image,$ord) {
+function ev_insert_data($title,$talent,$reserve_start,$reserve_end,$event_start, $url, $image,$ord,$type,$open) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
 	echo $id .':'.$title.':'.$url.':'.$image.':'.$ord;
     $result = $wpdb->insert(
         $table_name,
         array(
-			'id' => $id,
             'title' => $title,
+            'talent' => $talent,
+            'reserve_start' => $reserve_start,
+            'reserve_end' => $reserve_end,
+            'event_start' => $event_start,
             'url' => $url,
 			'image' => $image,
-			'ord' => $ord
+			'ord' => $ord,
+            'type' => $type,
+            'open' => $open
         )
     );
     if ($result === false) {
@@ -107,16 +112,22 @@ function ev_read_data($id) {
 }
 
 // データを更新
-function ev_update_data($id, $title, $url,$image,$ord) {
+function ev_update_data($id, $title,$talent,$reserve_start,$reserve_end,$event_start, $url,$image,$ord,$type,$open) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $result = $wpdb->update(
         $table_name,
         array(
             'title' => $title,
+            'talent' => $talent,
+            'reserve_start' => $reserve_start,
+            'reserve_end' => $reserve_end,
+            'event_start' => $event_start,
             'url' => $url,
 			'image' => $image,
-			'ord' => $ord
+			'ord' => $ord,
+            'type' => $type,
+            'open' => $open
         ),
         array('id' => $id)
     );
@@ -142,26 +153,38 @@ function ev_delete_data($id) {
 // サブメニューイベント表示
 //=================================================
 function planets_event_entry_page_contents() {
-
 	ob_start();
     // フォームからのデータを処理
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
 
         if ($action === 'create') {
-            $id = intval($_POST['id']);
             $title = sanitize_text_field($_POST['title']);
+            $talent = sanitize_text_field($_POST['talent']);
+            $reserve_start = sanitize_text_field($_POST['reserve_start']);
+            $reserve_end = sanitize_text_field($_POST['reserve_end']);
+            $event_start = sanitize_text_field($_POST['event_start']);
             $url = sanitize_url($_POST['url']);
             $image = sanitize_url($_POST['image']);
+            echo 'aaaaa';
+            echo $image;
             $ord = intval($_POST['ord']);
-            ev_insert_data($id,$title, $url,$image,$ord);
+            $type = intval($_POST['type']);
+            $open = intval($_POST['open']);
+            ev_insert_data($title,$talent,$reserve_start,$reserve_end,$event_start, $url,$image,$ord,$type,$open);
         } elseif ($action === 'update') {
             $id = intval($_POST['id']);
             $title = sanitize_text_field($_POST['title']);
+            $talent = sanitize_text_field($_POST['talent']);
+            $reserve_start = sanitize_text_field($_POST['reserve_start']);
+            $reserve_end = sanitize_text_field($_POST['reserve_end']);
+            $event_start = sanitize_text_field($_POST['event_start']);
             $url = sanitize_url($_POST['url']);
             $image = sanitize_url($_POST['image']);
             $ord = intval($_POST['ord']);
-            ev_update_data($id, $title, $url,$image,$ord);
+            $type = intval($_POST['type']);
+            $open = intval($_POST['open']);
+            ev_update_data($id, $title,$talent,$reserve_start,$reserve_end,$event_start, $url,$image,$ord,$type,$open);
         } elseif ($action === 'delete') {
             $id = intval($_POST['id']);
             ev_delete_data($id);
@@ -172,9 +195,15 @@ function planets_event_entry_page_contents() {
     $data = array(
         'id' => '',
         'title' => '',
+        'talent' => '',
+        'reserve_start' => '',
+        'reserve_end' => '',
+        'event_start' => '',
         'url' => '',
         'image' => '',
-        'ord' => ''
+        'ord' => '',
+        'type' => 1,
+        'open' => 0
     );
 
     if (isset($_GET['edit'])) {
@@ -182,44 +211,93 @@ function planets_event_entry_page_contents() {
         $data = ev_read_data($id);
     }
 
+    wp_enqueue_script( 'media-uploader-main-js', plugins_url( 'js/media-uploader-main.js', __FILE__ ), array( 'jquery' ) );
+    wp_enqueue_media();
+
 	?>
     <h2>イベント表示制御</h2>
 
     <!-- データ入力フォーム -->
+    <table>
     <form method="post">
-        <label for="id">id:</label>
-        <input type="text" name="id" size=2 value="<?php echo $data['id']; ?>" required>
-		<br>
-        <label for="title">タイトル:</label>
+        <tr>
+        <input type="hidden" name="id" size=2 value="<?php echo $data['id']; ?>" required>
+        <tr><td>
+        <label for="talent">タレント名</label></td><td>
+        <input type="text" name="talent" size=50 id="title" value="<?php echo $data['talent']; ?>" required>
+        </td></tr><tr><td>
+        <label for="event_start">イベント時間</label></td><td>
+        <input type="text" name="event_start" size=50 id="title" value="<?php echo $data['event_start']; ?>" required>
+        </td></tr><tr><td>
+        <label for="title">タイトル</label></td><td>
         <input type="text" name="title" size=50 id="title" value="<?php echo $data['title']; ?>" required>
-        <br>
-        <label for="url">url:</label>
+        </td></tr><tr><td>
+        <label for="reserve_start">告知開始日</label></td><td>
+        <input type="text" name="reserve_start" size=50 id="title" value="<?php echo $data['reserve_start']; ?>" required>
+        </td></tr><tr><td>
+        <label for="url">url</label></td><td>
         <input type="text" name="url" size=50 id="url" value="<?php echo $data['url']; ?>" required>
-        <br>
-        <label for="image">image:</label>
-        <input type="text" name="image" size=50 id="image" value="<?php echo $data['image']; ?>" required>
-        <br>
-        <label for="ord">順序(0:最新,1,2,...):</label>
+        </td></tr><tr><td>
+        <label for="image">画像</label></td><td>
+        <?php if($data['image'] == ''){ ?>
+        <p><img id="image-view" src="<?php echo plugins_url( 'images/noimage.png', __FILE__ ) ?>" width="130"></p>
+        <?php }else{ ?>
+        <p><img id="image-view" src="<?php echo $data['image']; ?>" width="130"></p>
+        <?php } ?>
+        <p><input id="image" type="text" name="image" class="large-text" value="<?php echo $data['image']; ?>"></p>
+        </div>
+        </td></tr><tr><td>
+        <label for="ord">順序(降順)</label></td><td>
         <input type="text" name="ord" id="ord" size=2 value="<?php echo $data['ord']; ?>" required>
-        <br>
+        </td></tr><tr><td>
+        <label for="type">種別</label></td><td>
+        <select name="type" id="type" >
+           <option value="1" <?php if ( ! empty( $data['type'] ) ) { if ( '1' === $data['type'] ) { echo 'selected'; } } ?>>Event</option>
+           <option value="2" <?php if ( ! empty( $data['type'] ) ) { if ( '2' === $data['type'] ) { echo 'selected'; } } ?>>Goods</option>
+        </select>
+        </td></tr><tr><td>
+        <label for="open">公開</label></td><td>
+        <select name="open" id="open" >
+           <option value="1" <?php if ( ! empty( $data['open'] ) ) { if ( '1' === $data['open'] ) { echo 'selected'; } } ?>>公開</option>
+           <option value="0" <?php if ( ! empty( $data['open'] ) ) { if ( '0' === $data['open'] ) { echo 'selected'; } } ?>>非公開</option>
+        </select>
+        </td></tr><tr><td></td><td>
         <input type="hidden" name="action" value="<?php echo $data['id'] ? 'update' : 'create'; ?>">
         <input type="submit" value="<?php echo $data['id'] ? '更新' : '登録'; ?>">
-    </form>
-
+        </td></tr>
+    </form></table>
+    <hr>
     <!-- データ一覧 -->
     <ul class="drag-list">
         <?php
         global $wpdb;
         $table_name = $wpdb->prefix . 'pl_event';
-        $results = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+        $results = $wpdb->get_results("SELECT * FROM $table_name order by type,ord desc", ARRAY_A);
         foreach ($results as $row) {
-            echo '<li draggable="true">';
-            echo '<div><img src="' . $row['image'] . '" width=100></div>';
-            echo '<div>' . $row['title'] . '</div>';
-            echo '<div><a href="' . $row['url'] . '" target="_blank">表示</a></div>';
-            echo '<div><a href="?page=planetsevententry&edit=' . $row['id'] . '">編集</a> | ';
-            echo '<form method="post" style="display:inline;"><input type="hidden" name="id" value="' . $row['id'] . '"><input type="hidden" name="action" value="delete"><input type="submit" value="削除" onclick="return confirm(\'本当に削除しますか？\');"></form></div>';
-            echo '</li>';
+            echo '<li draggable="true" style="margin:20px;border: 2px solid #000000;">  ';
+            echo '<div style="display:flex;border"><div style="margin:1px;border: 1px solid #000000;">';
+            if($row['type']==='1'){
+            echo '<div>EVENT</div>';
+            }else{
+            echo '<div>GOODS</div>';
+            }
+            echo '<div>'.$row['ord'].'</div>';
+            if($row['open']==='1'){
+            echo '<div>公開</div>';
+            }else{
+            echo '<div>非公開</div>';
+            }
+            echo '</div><div><img src="' . $row['image'] . '" width=100></div>';
+            echo '<div style="margin:1px;border: 1px solid #000000;"><div>' . $row['talent'] . '</div>';
+            if($row['type']==='1'){
+            echo '<div>' . $row['event_start'] . '</div>';
+            }
+            echo '<div>' . $row['title'] . '</div></div>';
+            echo '<div style="margin:1px;border: 1px solid #000000;"><div>' . $row['reserve_start'] . '</div></div>';
+            echo '<div style="margin:1px;border: 1px solid #000000;"><div><a href="' . $row['url'] . '" target="_blank">表示</a></div>';
+            echo '<div><a href="?page=planetsevententry&edit=' . $row['id'] . '">編集</a></div>';
+            echo '<div><form method="post" style="display:inline;"><input type="hidden" name="id" value="' . $row['id'] . '"><input type="hidden" name="action" value="delete"><input type="submit" value="削除" onclick="return confirm(\'本当に削除しますか？\');"></form></div>';
+            echo '</div></li>';
         }
 		echo '</ul>';
 }
@@ -287,6 +365,19 @@ function dl_delete_data($id) {
         echo "Data insertion failed: " . $wpdb->last_error;
     }
 }
+// データを更新
+function dl_upsert_data($id, $purchase_date, $item_name, $path,$email) {
+    global $wpdb;
+    $sql = "INSERT INTO {$wpdb->prefix}pl_dl_contents (id,purchase_date,item_name,path,email) ";
+    $sql .= "VALUES (%d,%s,%s,%s,%s) ON conflict(id) do update ";
+    $sql .= "set purchase_date = %s,item_name = %s ,path = %s,email = %s";
+    var_dump($sql); // debug
+    $sql = $wpdb->prepare($sql,$purchase_date,$item_name,$path,$email,$purchase_date,$item_name,$path,$email);
+    var_dump($sql); // debug 
+    $result = $wpdb->query($sql);
+    echo $result;
+}
+
 
 //=================================================
 // サブメニューイベント表示
@@ -318,7 +409,8 @@ function planets_download_contents() {
             $item_name = sanitize_text_field($_POST['item_name']);
             $path = sanitize_url($_POST['path']);
             $email = sanitize_email($_POST['email']);
-            dl_insert_data($id,$purchase_date, $item_name,$path,$email);
+            //dl_insert_data($id,$purchase_date, $item_name,$path,$email);
+            dl_upsert_data($id,$purchase_date, $item_name,$path,$email);
         } elseif ($action === 'update') {
             $id = intval($_POST['id']);
             $purchase_date = $_POST['purchase_date'];
@@ -355,28 +447,50 @@ function planets_download_contents() {
     $query .= " ORDER BY id DESC LIMIT $per_page OFFSET $offset";
 
     $results = $wpdb->get_results($query, ARRAY_A);
-	?>
+
+    // CSVアップロード処理
+    if (isset($_FILES['csv_file']['tmp_name'])) {
+        $csv_file = $_FILES['csv_file']['tmp_name'];
+        if (is_uploaded_file($csv_file)) {
+            $handle = fopen($csv_file, 'r');
+            if ($handle !== false) {
+                while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                    $name = sanitize_text_field($data[0]);
+                    $email = sanitize_email($data[1]);
+                    upsert_data($name, $email);
+                }
+                fclose($handle);
+                $success_message = "CSVファイルのアップロードが完了しました。";
+                echo '<div class="updated"><p>' . $success_message . '</p></div>';
+            }
+        }
+    }
+
+?>
     <h2>DLコンテンツ管理</h2>
 
     <!-- データ入力フォーム -->
+    <table>
     <form method="post">
         <input type="hidden" name="id" size=2 value="<?php echo $data['id']; ?>" required>
-		<br>
-        <label for="email">Email:</label>
+		<tr><td>
+        <label for="email">Email:</label></td><td>
         <input type="text" name="email" size=50 id="email" value="<?php echo $data['email']; ?>" required>
-		<br>
-        <label for="purchase_date">購入日:</label>
+        </td></tr><tr><td>
+        <label for="purchase_date">購入日:</label></td><td>
         <input type="text" name="purchase_date" size=50 id="purchase_date" value="<?php echo $data['purchase_date']; ?>" required>
-		<br>
-        <label for="item_name">item名:</label>
+        </td></tr><tr><td>
+        <label for="item_name">item名:</label></td><td>
         <input type="text" name="item_name" size=50 id="item_name" value="<?php echo $data['item_name']; ?>" required>
-        <br>
-        <label for="path">path:</label>
+        </td></tr><tr><td>
+        <label for="path">path:</label></td><td>
         <input type="text" name="path" size=50 id="path" value="<?php echo $data['path']; ?>" required>
-        <br>
+        </td></tr><tr><td></td><td>
         <input type="hidden" name="action" value="<?php echo $data['id'] ? 'update' : 'create'; ?>">
         <input type="submit" value="<?php echo $data['id'] ? '更新' : '登録'; ?>">
-    </form>
+        </td></tr>
+    </form></table>
+    <hr>
     <!-- 検索フォーム -->
     <form method="get">
         <input type="hidden" name="page" value="crud-page">
@@ -393,7 +507,7 @@ function planets_download_contents() {
             echo '<td>'.$row['purchase_date'].'</td>';
             echo '<td>'.$row['item_name'].'</td>';
             echo '<td>'.$row['path'].'</td>';
-            echo '<td><a href="?page=planetsevententry&edit=' . $row['id'] . '">編集</a> | ';
+            echo '<td><a href="?page=pldlcontents&edit=' . $row['id'] . '">編集</a> | ';
             echo '<form method="post" style="display:inline;"><input type="hidden" name="id" value="' . $row['id'] . '"><input type="hidden" name="action" value="delete"><input type="submit" value="削除" onclick="return confirm(\'本当に削除しますか？\');"></form></td>';
             echo '</tr>';
         }
@@ -414,7 +528,16 @@ function planets_download_contents() {
         echo '</div>';
         echo '</div>';
     }
-//    return ob_get_clean();
+?>
+    <h2>DLコンテンツアップロード</h2>
+    <h3>emailとファイルパスを更新して下さい</h3>
+    <form method="post" enctype="multipart/form-data">
+        <label for="csv_file">CSVファイルを選択:</label>
+        <input type="file" name="csv_file" id="csv_file" accept=".csv">
+        <input type="submit" value="アップロード">
+    </form>
+<?php
+    //    return ob_get_clean();
 }
 
 //=================================================

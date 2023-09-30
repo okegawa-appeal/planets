@@ -4,7 +4,7 @@ Tags: Welcart, e-Commerce, shopping, cart, eShop, store, admin, calendar, manage
 Requires at least: 5.5
 Tested up to: 6.3
 Requires PHP: 7.4 - 8.0
-Stable tag: 2.8.21
+Stable tag: 2.8.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ Please see [Welcart Forum(Japanese)](https://www.welcart.com/community/forums).
 
 
 == Changelog ==
+14 Sep 2023
+= V2.8.22 =
+-----------
+* Enhanced security ( Item List page and Credit Card Payment Setup page and Order Data Edit page).
+* Restricted the types of attachment emails that can be sent from the order data edit page.
+
 28 Aug 2023
 = V2.8.21 =
 -----------

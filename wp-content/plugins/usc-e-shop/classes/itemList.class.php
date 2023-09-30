@@ -361,6 +361,7 @@ class dataList {
 	 * @return dataList $searchSql string search sql condition.
 	 */
 	public function setSearchSql() {
+		global $wpdb;
 		switch ( $this->arr_search['column'] ) {
 			case 'post_id':
 				$column            = 'post.ID';
@@ -368,7 +369,7 @@ class dataList {
 				$have_post_id_to   = ! empty( $this->arr_search['word']['post_id_to'] );
 
 				if ( $have_post_id_from ) {
-					$this->searchSql = $column . '>=' . esc_sql( $this->arr_search['word']['post_id_from'] );
+					$this->searchSql = $wpdb->prepare( $column . ' >= %d', (int) $this->arr_search['word']['post_id_from'] );
 				}
 
 				if ( $have_post_id_from && $have_post_id_to ) {
@@ -376,7 +377,7 @@ class dataList {
 				}
 
 				if ( $have_post_id_to ) {
-					$this->searchSql .= $column . '<=' . esc_sql( $this->arr_search['word']['post_id_to'] );
+					$this->searchSql .= $wpdb->prepare( $column . ' <= %d', (int) $this->arr_search['word']['post_id_to'] );
 				}
 				break;
 			case 'item_code':

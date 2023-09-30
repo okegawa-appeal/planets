@@ -11658,7 +11658,7 @@ msgstr "お客様情報"
 
 #: classes/usceshop.class.php:9221 functions/filters.php:506
 msgid "In the cart"
-msgstr "カートの中"
+msgstr "カート"
 
 #: classes/usceshop.class.php:9086
 msgid "to the cart"

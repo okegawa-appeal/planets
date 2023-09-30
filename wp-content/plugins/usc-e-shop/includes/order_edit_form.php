@@ -350,6 +350,8 @@ $mail_data = usces_mail_data();
 
 $usedpoint_readonly = ( usces_is_membersystem_point() && ! empty( $data['mem_id'] ) ) ? '' : ' readonly';
 $getpoint_readonly  = ( usces_is_membersystem_point() ) ? '' : ' readonly';
+
+$email_attach_file_extension = wel_email_attach_file_extension( explode( ',', strtolower( $this->options['email_attach_file_extension'] ) ) );
 ?>
 <style>
 	.usces_tablenav #mailVisiLink {
@@ -1179,7 +1181,7 @@ jQuery(function($){
 			var checkValidExtension = true;
 			var attachFile = document.getElementById("sendmailattachfile");
 			var maximunFileSize = <?php echo (int) $this->options['email_attach_file_size']; ?>; // unit is Mb
-			var validFileExtensions = <?php echo json_encode( ! empty( $this->options['email_attach_file_extension'] ) ? explode( ',', $this->options['email_attach_file_extension'] ) : array() ); ?>; // file extension
+			var validFileExtensions = <?php echo json_encode( $email_attach_file_extension ); ?>; // file extension
 			if (attachFile && attachFile.files[0]) {
 				// validate file size
 				if (maximunFileSize > 0) {
@@ -2146,9 +2148,9 @@ endif;
 					_e( 'Maximum size of email attachment', 'usces' );
 					echo ": " . $this->options['email_attach_file_size'] . "MB. ";
 				} 
-				if ( ! empty($this->options['email_attach_file_extension'] ) ) {
+				if ( ! empty( $email_attach_file_extension ) ) {
 					_e( 'File extension support', 'usces' );
-					echo " ("  . $this->options['email_attach_file_extension'] . ")";
+					echo " ("  . implode( ',', $email_attach_file_extension ) . ")";
 				}
 				?>
 			</div>

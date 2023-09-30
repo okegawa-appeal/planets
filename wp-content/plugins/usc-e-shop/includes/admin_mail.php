@@ -187,7 +187,7 @@ jQuery( function($) {
 				<tr class="email_attach_feature">
 					<th width="150"><a class="explanation-label" id="label_ex_put_file_extension"><?php _e('Extensions of attachments', 'usces'); ?></a></th>
 					<td colspan="4"><input name="email_attach_file_extension" id="email_attach_file_extension" type="text" class="regular-text" value="<?php echo esc_attr($put_email_attach_file_extension); ?>" /></td>
-					<td><div id="ex_put_file_extension" class="explanation"><?php _e('Enter the file extension of the email attachment (jpg, png, pdf, etc.) separated by commas.', 'usces'); ?><?php _e('If not entered, the extension will not be checked.', 'usces'); ?></div></td>
+					<td><div id="ex_put_file_extension" class="explanation"><?php _e('Enter the file extension of the email attachment (jpg, png, pdf, etc.) separated by commas.', 'usces'); ?></div></td>
 				</tr>
 				<tr class="email_attach_feature">
 					<th width="150"><a class="explanation-label" id="label_ex_put_file_size"><?php _e('Maximum size of email attachment', 'usces'); ?></a></th>

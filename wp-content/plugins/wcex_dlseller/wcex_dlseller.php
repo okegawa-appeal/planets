@@ -3971,11 +3971,11 @@ function dlseller_completion_info( $usces_carts , $out = ' ' ) {
 				if ( $item_custom ) {
 					$list .= $item_custom;
 				}
-				if ( true !== $purchased && 'transferDeferred' !== $payments['settlement'] ) {
+/*				if ( true !== $purchased && 'transferDeferred' !== $payments['settlement'] ) {
 					$purchase_mes = '<p>' . __( 'I am in the dispatch of the product if I can confirm the receipt of money.', 'dlseller' ) . '</p>';
 				} else {
 					$purchase_mes = '';
-				}
+				}*/
 				$list .= apply_filters( 'dlseller_filter_shipped_purchase_message', $purchase_mes, $purchased );
 				$list .= '</div>';
 				$list .= '<div class="clear"></div>';

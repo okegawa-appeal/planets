@@ -10,7 +10,6 @@ get_header();
 ?>
 
 	<div id="primary" class="site-content">
-					ああ
 		<div id="content" role="main">
 		<?php
 		if ( have_posts() ) :
@@ -19,14 +18,6 @@ get_header();
 				?>
 			<article <?php post_class(); ?> id="post-<?php the_ID(); ?>">
 				<h2 class="entry-title"><a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a></h2>
-
-				<div class="entry-meta">
-					<span class="date"><time><?php the_time( get_option( 'date_format' ) ); ?></time></span>
-					<span class="cat"><?php esc_html_e( 'Filed under:' ); ?> <?php the_category( ',' ); ?></span>
-					<span class="tag"><?php the_tags( __( 'Tags: ' ) ); ?></span>
-					<span class="author"><?php the_author(); ?><?php edit_post_link( __( 'Edit This' ) ); ?></span>
-				</div>
-
 				<div class="entry-content">
 					<?php the_content(); ?>
 				</div>

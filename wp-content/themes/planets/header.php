@@ -16,9 +16,20 @@
 	<meta name="format-detection" content="telephone=no"/>
 
 	<?php wp_head(); ?>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+	<!-- link rel="preconnect" href="https://fonts.googleapis.com" -->
+	<!-- link rel="preconnect" href="https://fonts.gstatic.com" crossorigin -->
+	<!-- link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VHBJV0SMD7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VHBJV0SMD7');
+</script>
 </head>
 
 <body <?php body_class(); ?>>
@@ -31,13 +42,13 @@
 
 			<p class="site-description"><?php bloginfo( 'description' ); ?></p>
 			<?php if ( is_home() || is_front_page() ) : ?>
-				<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/planets_logo2.webp"></a></h1>
+				<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/logo.webp"></a></h1>
 			<?php else : ?>
-				<div class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/planets_logo2.webp"></a></div>
+				<div class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/logo.webp"></a></div>
 			<?php endif; ?>
 			<?php if ( ! welcart_basic_is_cart_page() ) : ?>
 
-			<div class="snav cf">
+			<div class="snav cf planets-header">
 
 				<?php if ( usces_is_membersystem_state() ) : ?>
 					<div class="membership">
@@ -74,8 +85,8 @@
 
 	</header><!-- #masthead -->
 
-	<?php if ( ( is_front_page() || is_home() ) && get_header_image() ) : ?>
-	<?php my_header_img_slic(3,true);?>
+	<?php if ( ( is_front_page() || is_home() )) : ?>
+		<?php xo_slider( 96 ); ?>
 	<?php endif; ?>
 
 	<?php

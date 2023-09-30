@@ -16,7 +16,6 @@ $url = get_pagenum_link();
 global $wpdb;
 $query = 'select * FROM wp_pl_event where url = "'.$url.'"';
 $results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
-;
 ?>
 
 
@@ -39,11 +38,8 @@ $results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 			</header><!-- .page-header -->
 
 
-
 		<?php if ( usces_is_cat_of_item( get_query_var( 'cat' ) ) ) : ?>
-
 			<?php if ( have_posts() ) : ?> 
-
 				<div class="cat-il type-grid">
 
 					<?php
@@ -61,7 +57,7 @@ $results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 							<div class="iteminfo">
 								<div class="itemname"><a href="<?php the_permalink(); ?>"  rel="bookmark"><?php usces_the_itemName(); ?></a></div>
 								<div class="itemprice">
-									<?php usces_the_firstPriceCr(); ?><?php usces_guid_tax(); ?>
+									価格：<?php usces_the_firstPriceCr(); ?><?php usces_guid_tax(); ?>
 								</div>
 								<?php usces_crform_the_itemPriceCr_taxincluded(); ?>
 							</div>
@@ -78,9 +74,7 @@ $results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 			<?php endif; ?>
 
 		<?php else : ?>
-
 			<?php if ( have_posts() ) : ?>
-
 				<div class="post-li">
 					<?php
 					while ( have_posts() ) :
