@@ -12,13 +12,19 @@ get_header();
 add_filter( 'get_the_archive_title', function( $title ) {
   return single_cat_title('', false);
 });
-$url = get_pagenum_link();
-global $wpdb;
-$query = 'select * FROM wp_pl_event where url = "'.$url.'"';
-$results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
+$cat = get_the_category();
+$item = $cat[0];
+$category_image = get_term_meta( $item->term_id, 'category-image', true );
+if(!empty($category_image)){
+	$image = $category_image;
+}else{
+	$url = get_pagenum_link();
+	global $wpdb;
+	$query = 'select * FROM wp_pl_event where url = "'.$url.'"';
+	$results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
+	$image = $results[0]['image'];
+}
 ?>
-
-
 
 	<section id="primary" class="site-content">
 		<div id="content" role="main">
@@ -28,7 +34,7 @@ $results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 				the_archive_title( '<h1 class="page-title">', '</h1>' );
 				echo '<div class="categorypage-container">';
 				echo '<div class="categorypage-image">';
-				echo '<img class="categorypage-image" src="'.$results[0]['image'].'">';
+				echo '<img class="categorypage-image" src="'.$image.'">';
 				echo '</div>';
 				echo '<div class="categorypage-description">';
 				the_archive_description( '<div class="taxonomy-description">', '</div>' );
@@ -57,7 +63,7 @@ $results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 							<div class="iteminfo">
 								<div class="itemname"><a href="<?php the_permalink(); ?>"  rel="bookmark"><?php usces_the_itemName(); ?></a></div>
 								<div class="itemprice">
-									価格：<?php usces_the_firstPriceCr(); ?><?php usces_guid_tax(); ?>
+									<?php usces_the_firstPriceCr(); ?><?php usces_guid_tax(); ?>
 								</div>
 								<?php usces_crform_the_itemPriceCr_taxincluded(); ?>
 							</div>

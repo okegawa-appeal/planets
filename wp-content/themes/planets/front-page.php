@@ -68,8 +68,11 @@ if( ! empty( $postslist ) ){
 ?>
 				</ul>
 			</div>
-			<div class="announce_twitter">
+			<div class="announce_news">
+				<ul>
+					<li><a href="https://twitter.com/WPlanets23543" target="_blank"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/xlink.png"></a></li>
 				<!-- a class="twitter-timeline" data-lang="ja" data-height="400" href="https://twitter.com/MUVUS_oshirase?ref_src=twsrc%5Etfw">Tweets by MUVUS_oshirase</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script -->
+				</ul>
 			</div>
 		</div>
 		<div>
