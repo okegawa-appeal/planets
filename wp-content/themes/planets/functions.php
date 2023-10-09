@@ -257,4 +257,75 @@ function getcatorder( $query ) {
 }
 add_action( 'pre_get_posts', 'getcatorder' );
 
+#### SKUにbookend contentsidを追加 ####
+add_filter( 'usces_filter_sku_meta_form_advance_title', 'add_new_sku_meta_title'); //項目を追加
+function add_new_sku_meta_title(){
+	return '<th colspan="2">bookend Contents ID</th>';
+}
+
+add_filter( 'usces_filter_sku_meta_form_advance_field', 'add_new_sku_meta_field'); //フィールドを新規追加
+function add_new_sku_meta_field(){
+	return '<td colspan="2" class="item-sku-zaikonum"><input name="newskuadvance" type="text" id="newskuadvance" class="newskuadvance metaboxfield" /></td>';
+}
+
+add_filter( 'usces_filter_sku_meta_row_advance', 'add_new_sku_meta_row_advance',10,2); //フィールドを追加
+function add_new_sku_meta_row_advance( $default_field, $sku ){
+	$metaname = 'itemsku[' .$sku["meta_id"]. '][skuadvance]';
+	return '<td colspan="2" class="item-sku-zaikonum"><input name="' .$metaname.'" type="text" id="' .$metaname. '" class="newskuadvance metaboxfield" value="' .$sku["advance"]. '"/></td>';
+}
+
+add_filter( 'usces_filter_add_item_sku_meta_value', 'add_new_sku_meta'); //新規項目を作成
+function add_new_sku_meta($value){
+	$skuadvance = isset($_POST['newskuadvance']) ? $_POST['newskuadvance'] : '';
+	$value['advance'] = $skuadvance;
+	return $value;
+}
+
+add_filter( 'usces_filter_up_item_sku_meta_value', 'up_new_sku_meta'); //項目を変更
+function up_new_sku_meta($value){
+	$skuadvance = isset($_POST['skuadvance']) ? $_POST['skuadvance'] : '';
+	$value['advance'] = $skuadvance;
+	return $value;
+}
+
+add_filter( 'usces_filter_item_save_sku_metadata', 'save_new_sku_meta',10,2 ); //項目を保持
+function save_new_sku_meta( $skus, $mid ){
+	$skuadvance = isset($_POST['itemsku'][$mid]['skuadvance']) ? $_POST['itemsku'][$mid]['skuadvance']: '';
+	$skus['advance'] = $skuadvance;
+	return $skus;
+}
+
+#### 決済確定時の処理 ####
+function custome_usces_action_reg_orderdata( $args )
+{
+  $carts = $args['cart'];
+  $email = $args['entry']['delivery']['mailaddress1'];
+  foreach($carts as $cart){
+    $sku = wel_get_sku($cart['post_id'],$cart['sku']);
+    $bookendid = $sku['advance'];
+  }
+}
+#add_action( 'usces_action_reg_orderdata', 'custome_usces_action_reg_orderdata' );
+
+#### 決済確定時の処理 ####
+function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
+  $email = $entries['customer']['mailaddress1'];
+  $payment = $entries['order']['payment_name'];
+  foreach($carts as $cart){
+    $sku = wel_get_sku($cart['post_id'],$cart['sku']);
+    $bookendid = trim($sku['advance']);
+    if($payment=='クレジットカード'){
+      if(!is_array($bookendid)){
+        if(isset($bookendid) && !empty($bookendid)){
+          if($bookendid != 'Array'){
+              //bookend登録処理
+            bookend_entry_data($email,$bookendid);
+          }
+        }
+      }
+    }
+  }
+}
+add_action( 'usces_action_cartcompletion_page_body', 'custome_usces_action_cartcompletion_page_body' ,10,2);
+
 ?>
