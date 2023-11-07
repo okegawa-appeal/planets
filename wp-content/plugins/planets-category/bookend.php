@@ -7,7 +7,73 @@ Version: 1.0
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+if (!class_exists('WP_List_Table')) {
+    require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+}
 
+// Define custom WP_List_Table class for displaying custom table data
+class PL_Bookend_History_List_Table extends WP_List_Table
+{
+    // Define columns for the table
+    function get_columns()
+    {
+        return array(
+            'email' => 'email',
+            'contentsid' => 'contentsid',
+            'errormsg' => 'errormsg',
+            'createdate' => 'createdate'
+        );
+    }
+
+    // Prepare data for the table
+    function prepare_items()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'pl_bookend_history';
+        $per_page = 100;
+        $current_page = $this->get_pagenum();
+        $offset = ($current_page - 1) * $per_page;
+
+        $total_items = $wpdb->get_var("SELECT COUNT(*) FROM $table_name ");
+		$this->set_pagination_args(array(
+            'total_items' => $total_items,
+            'per_page'    => $per_page,
+        ));
+
+        $columns = $this->get_columns();
+        $hidden = array();
+        $sortable = $this->get_sortable_columns();
+
+        $this->_column_headers = array($columns, $hidden, $sortable);
+
+        $orderby = (!empty($_GET['orderby'])) ? sanitize_text_field($_GET['orderby']) : 'id';
+        $order = (!empty($_GET['order']) && in_array(strtoupper($_GET['order']), array('ASC', 'DESC'))) ? strtoupper($_GET['order']) : 'ASC';
+
+//        $data = $wpdb->get_results("SELECT * FROM $table_name ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A);
+        $data = $wpdb->get_results("SELECT * FROM $table_name order by createdate desc LIMIT $per_page OFFSET $offset", ARRAY_A);
+//        $data = $wpdb->get_results("SELECT * FROM $table_name ", ARRAY_A);
+
+        $this->items = $data;
+    }
+
+    // Display each column's content
+    function column_default($item, $column_name)
+    {
+        return isset($item[$column_name]) ? $item[$column_name] : '';
+    }
+
+    // Make columns sortable
+    function get_sortable_columns()
+    {
+        return array(
+            'email' => array('email', false),
+            'contentsid' => array('contentsid', false),
+            'errormsg' => array('errormsg', false),
+            'createdate' => array('createdate', false)
+        );
+    }
+}
 //=================================================
 // 管理画面に「とりあえずメニュー」を追加登録する
 //=================================================
@@ -90,6 +156,9 @@ EOF;
 </div>
 
 EOF;
+    $list_table = new PL_Bookend_History_List_Table();
+    $list_table->prepare_items();
+    $list_table->display();
 
 }
 // データを読み取り
@@ -106,7 +175,7 @@ function bookend_entry_data($email,$bookendid) {
 			'OwnerLoginName' => 'double',
 			'OwnerPassword' => 'D9yEpTJf',
 			'MailAddress' => $email,
-			'Create' => true
+			'Create' => 'true'
 		)
 	);
 	$response 	= wp_remote_post( $getuserurl, $args );
@@ -157,7 +226,9 @@ function bookend_entry_data($email,$bookendid) {
 			bookend_history($email,$bookendid,null);
 		}else{
 			bookend_history($email,$bookendid,$result);
-	        echo "E-B1001:エラーが発生しました。BOOKENDのコンテンツ登録に失敗しました。";
+			if($data['Status'] != '80014'){
+		        echo "E-B1001:エラーが発生しました。BOOKENDのコンテンツ登録に失敗しました。";
+			}
 		}
 	}
 

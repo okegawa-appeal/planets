@@ -85,11 +85,16 @@
 
 	</header><!-- #masthead -->
 
-	<?php if ( ( is_front_page() || is_home() )) : ?>
-		<?php xo_slider( 96 ); ?>
-	<?php endif; ?>
+	<?php 
+	if ( ( is_front_page() || is_home() )) {
+		if(wp_is_mobile()){
+//			xo_slider( 392 );
+			xo_slider( 96 ); 
+		}else{
+			xo_slider( 96 ); 
+		}
+	} 
 
-	<?php
 	if ( is_front_page() || is_home() || welcart_basic_is_cart_page() || welcart_basic_is_member_page() ) {
 		$class = 'one-column';
 	} else {

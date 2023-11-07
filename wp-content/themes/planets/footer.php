@@ -18,7 +18,7 @@
 		<ul class="menu">
 			<li ><a href="https://planets-w.jp/tokusyo">特定商取引に基づく表記</a></li>
 			<li ><a href="https://planets-w.jp/privacy-policy/">プライバシーポリシー</a></li>
-			<li ><a href="https://planets-w.jp/bookend/">bookendアプリについて</a></li>
+			<li ><a href="https://planets-w.jp/help/">各種ヘルプページ</a></li>
 			<li ><a href="https://planets-w.jp/contact/">お問い合わせ</a></li>
 		</ul>
 		<p class="copyright">

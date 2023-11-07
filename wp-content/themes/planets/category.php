@@ -12,9 +12,8 @@ get_header();
 add_filter( 'get_the_archive_title', function( $title ) {
   return single_cat_title('', false);
 });
-$cat = get_the_category();
-$item = $cat[0];
-$category_image = get_term_meta( $item->term_id, 'category-image', true );
+//$category_image = get_term_meta( $item->term_id, 'category-image', true );
+$category_image = get_term_meta( get_queried_object_id(), 'category-image', true );
 if(!empty($category_image)){
 	$image = $category_image;
 }else{

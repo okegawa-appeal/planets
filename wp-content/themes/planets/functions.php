@@ -50,7 +50,7 @@ add_filter('wpcf7_form_tag', 'my_form_tag_filter', 11);
 function download_contents(){
   global $wpdb;
   $table_name = $wpdb->prefix . 'pl_dl_contents';
-  $query = "SELECT * FROM $table_name where email ='".usces_memberinfo( 'mailaddress1' ,'return')."'";
+  $query = "SELECT * FROM $table_name where email ='".usces_memberinfo( 'mailaddress1' ,'return')."' order by id desc";
   $results = $wpdb->get_results($query, ARRAY_A);
 
   echo '<h3>ダウンロードコンテンツ</h3>';
@@ -122,6 +122,7 @@ function my_category_add_form_fields( $taxonomy ) {
   </script>
   <?php
 }
+
 // カテゴリー編集画面に要素を追加するフック
 add_action( 'category_edit_form_fields', 'my_category_edit_form_fields', 10, 2 );
 function my_category_edit_form_fields( $tag, $taxonomy ) {
@@ -230,15 +231,52 @@ function my_the_payment_method($payments, $value){
     global $usces;
     $carts = $usces->cart->get_cart();
     $mysku = array('test'); //特定の商品のSKU
+      
     foreach($carts as $cart){
-        $sku = $cart['sku'];
-        if(in_array($sku, $mysku)){
-          echo 'testモード';
-          echo 'この表示が出たら決済が正しく行われません。';
-          echo 'お手数ですがお問い合わせよりお知らせください。';
-          print_r(wel_get_product($cart['post_id']));
-        }else{
+      $sku = $cart['sku'];
+
+      //銀行振込期限が含まれており期限切れの場合
+      $bank_expire_date = get_post_meta( $cart['post_id'], 'bank_expire_date', true );
+      $bank_expire_time = get_post_meta( $cart['post_id'], 'bank_expire_time', true );  
+      date_default_timezone_set('Asia/Tokyo');
+      $bank_expire = strtotime($bank_expire_date . ' ' . $bank_expire_time . ' JST');
+      $currentTime = time();
+      if ( isset( $bank_expire_date )  && !empty($bank_expire_date)) {
+        if ($currentTime > $bank_expire) {
+          foreach ($payments as $key => $payment) {
+            if (isset($payment['name']) && stripos($payment['name'],'銀行振込')!==false) {
+                unset($payments[$key]);
+            }
+          }
         }
+      }
+      if(in_array($sku, $mysku)){
+        echo 'testモード';
+        echo 'この表示が出たら決済が正しく行われません。';
+        echo 'お手数ですがお問い合わせよりお知らせください。';
+        echo '<br>';
+      }else{
+        //bookend商品の場合はクレジット決済に限定する
+        $sku = wel_get_sku($cart['post_id'],$sku);
+        $bookendid = trim($sku['advance']);
+        if(!is_array($bookendid)){
+          if(isset($bookendid) && !empty($bookendid)){
+            if($bookendid != 'Array'){
+              $payments = array(
+                array(
+                    'id' => 1,
+                    'name' => 'クレジット決済', //支払方法名
+                    'explanation' => 'VISA/MASTER/JCB/AMEXをご利用いただけます。', //説明
+                    'settlement' => 'acting_zeus_card', //決済種別
+                    'module' => '', //決済モジュール
+                    'sort' => 1, //表示順序
+                    'use' => 'activate', //activeで「使用」
+                ),
+              );
+            }
+          }
+        }
+      }
     }
     return $payments;
 }
@@ -250,12 +288,24 @@ function getcatorder( $query ) {
 
 	if ( $query->is_category() ) {
 		$query->set( 'posts_per_page', '-1' );
-		$query->set( 'orderby', 'itemCode' );
+    $query->set( 'orderby', 'meta_value' );   
+    $query->set( 'meta_key', 'itemCode' );
 		$query->set( 'order', 'ASC' );
 		return;
 	}
 }
+
+#### 保存時にカスタムフィールドに商品コードを追加し、ソート可能とする ####
 add_action( 'pre_get_posts', 'getcatorder' );
+
+function set_custom_field( $post_id, $post ) {
+   $product = wel_get_product( $post_id );
+   $itemcode = $product['itemCode'];
+   if( $itemcode ) {
+      update_post_meta( $post_id, 'itemcode', $itemcode );
+   }
+}
+add_action( 'save_post', 'set_custom_field', 99, 2 );
 
 #### SKUにbookend contentsidを追加 ####
 add_filter( 'usces_filter_sku_meta_form_advance_title', 'add_new_sku_meta_title'); //項目を追加
@@ -314,7 +364,7 @@ function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
   foreach($carts as $cart){
     $sku = wel_get_sku($cart['post_id'],$cart['sku']);
     $bookendid = trim($sku['advance']);
-    if($payment=='クレジットカード'){
+    if($payment=='クレジット決済'){
       if(!is_array($bookendid)){
         if(isset($bookendid) && !empty($bookendid)){
           if($bookendid != 'Array'){
@@ -327,5 +377,162 @@ function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
   }
 }
 add_action( 'usces_action_cartcompletion_page_body', 'custome_usces_action_cartcompletion_page_body' ,10,2);
+
+#### 銀行振込決済完了時（ステータス変更)　####
+function custom_usces_action_collective_order_reciept_each($id, $statusstr, $old_status){
+  error_log('usces_action_collective_order_reciept_each');
+  error_log("PLANETS テスト : 決済完了 " .$id.":".$statusstr.":".$old_status);
+}
+#add_action( 'usces_action_collective_order_reciept_each', 'custom_usces_action_collective_order_reciept_each' ,10,3);
+
+#### オーダーのステータスが変わったフック　####
+function custom_usces_action_update_orderdata( $new_orderdata, $old_status, $old_orderdata, $new_cart, $old_cart ){
+  error_log('usces_action_update_orderdata');
+  $message = 'PLANETS テスト = ' . print_r($new_orderdata,true);
+  error_log($message);
+}
+#add_action( 'usces_action_update_orderdata', 'custom_usces_action_update_orderdata' ,10,5);
+
+#### オーダーのステータスが変わったフック　####
+//受注リストの一括ステータス変更でfireした
+function custom_usces_action_collective_order_status( $param ){
+  error_log('usces_action_collective_order_status');
+  $message = 'PLANETS テスト = ' . print_r($param,true);
+  $log_message_parts = str_split($message, 1000);  // 1000文字ごとに分割
+  foreach ($log_message_parts as $part) {
+      error_log($message);
+  }
+}
+#add_action( 'usces_action_collective_order_status', 'custom_usces_action_collective_order_status' ,10,5);
+
+#### オーダーのステータスが変わったフック　####
+//受注リストの一括ステータス変更でfireした
+function custom_usces_action_collective_order_status_each( $id, $statusstr, $old_status ){
+  error_log('usces_action_collective_order_status_each');
+  error_log("PLANETS テスト : 一括画面操作 " .$id.":".$statusstr.":".$old_status);
+}
+
+#add_action( 'usces_action_collective_order_status_each', 'custom_usces_action_collective_order_status_each' ,10,3);
+
+
+#### 入金チェックフック　####
+function custom_usces_action_acting_getpoint( $order_id, $add ){
+  error_log('custom_usces_action_acting_getpoint');
+  $order_data = wel_get_order( $order_id );
+  $message = 'PLANETS テスト = ' . print_r($order_data,true);
+  
+  $log_message_parts = str_split($message, 1000);  // 1000文字ごとに分割
+  foreach ($log_message_parts as $part) {
+      error_log($part);
+  }
+}
+#add_action( 'usces_action_acting_getpoint', 'custom_usces_action_acting_getpoint' ,10,2);
+
+#### 商品画面に公開停止メタボックスを追加 ####
+function add_custom_metabox() {
+    $itemcode = ''; $page = '';
+    if ( isset($_GET['post']) ) $itemcode = get_post_meta( absint($_GET['post']), '_itemCode', true );
+    if ( isset($_GET['page']) ) $page = $_GET['page'];
+    if ( $page == 'usces_itemedit' || $page == 'usces_itemnew' || $itemcode ) {
+        add_meta_box( 'item-metabox', '公開終了日時', 'metabox_expire', 'post', 'side', 'low' );
+    }
+}
+add_action( 'add_meta_boxes', 'add_custom_metabox' );
+
+function metabox_expire() {
+        $post_id = get_the_ID();
+        $expire_date = get_post_meta( $post_id, 'expire_date', true ); // 現在の値を取得
+        $expire_time = get_post_meta( $post_id, 'expire_time', true ); // 現在の値を取得
+
+        // セキュリティのために追加
+        wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
+        ?>
+        <div class="my-metabox">
+        <label for="expire_date">日付</label></td><td>
+        <input type="date" name="expire_date" size=50 id="expire_date" value="<?php echo $expire_date; ?>"><br>
+        <label for="expire_time">時間</label>
+        <select id="expire_time" name="expire_time">
+        <?php 
+        for ($hour = 0; $hour < 24; $hour++) {
+            for ($minute = 0; $minute < 60; $minute += 30) {
+                $time = sprintf('%02d:%02d', $hour, $minute);
+                $selected = ($expire_time == $time) ? 'selected' : '';
+                echo '<option value="' . $time . '" ' . $selected . '>' . $time . '</option>';
+            }
+        } ?>
+        </select><br>
+        <button id="btn" onclick="document.getElementById('expire_date').value = '';document.getElementById('expire_time').value = '';">clear</button>
+        </div>
+        <?php
+}
+
+#### 保存時にカスタムフィールドに公開停止日時を登録＆cronに登録 ####
+function save_expire($post_id) {
+    // セキュリティのため追加
+    if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
+    if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
+
+    update_post_meta( $post_id, 'expire_date', $_POST['expire_date'] );
+    update_post_meta( $post_id, 'expire_time', $_POST['expire_time'] );
+    if ( isset( $_POST['expire_date'] )  && !empty($_POST['expire_date'])) {
+        $time_stamp = strtotime($_POST['expire_date'] . ' ' . $_POST['expire_time'] . ' JST');
+        wp_schedule_single_event($time_stamp, 'do_expire_post', array($post_id));
+    }
+}
+add_action('save_post', 'save_expire');
+
+####  CRONで商品を非公開に変更 ####
+function do_expire_post_update($pid) {
+   wp_update_post(array( 'ID' => $pid, 'post_status' => 'private' ) );
+}
+add_action('do_expire_post', 'do_expire_post_update');
+
+#### 商品画面に銀行振込の期限を追加 ####
+function add_custom_bank_metabox() {
+    $itemcode = ''; $page = '';
+    if ( isset($_GET['post']) ) $itemcode = get_post_meta( absint($_GET['post']), '_itemCode', true );
+    if ( isset($_GET['page']) ) $page = $_GET['page'];
+    if ( $page == 'usces_itemedit' || $page == 'usces_itemnew' || $itemcode ) {
+        add_meta_box( 'bank-metabox', '銀行振込締め切り', 'metabox_bank_expire', 'post', 'side', 'low' );
+    }
+}
+add_action( 'add_meta_boxes', 'add_custom_bank_metabox' );
+
+function metabox_bank_expire() {
+        $post_id = get_the_ID();
+        $bank_expire_date = get_post_meta( $post_id, 'bank_expire_date', true ); // 現在の値を取得
+        $bank_expire_time = get_post_meta( $post_id, 'bank_expire_time', true ); // 現在の値を取得
+
+        // セキュリティのために追加
+        wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
+        ?>
+        <div class="my-bank_metabox">
+        <label for="bank_expire_date">日付</label></td><td>
+        <input type="date" name="bank_expire_date" size=50 id="bank_expire_date" value="<?php echo $bank_expire_date; ?>"><br>
+        <label for="bank_expire_time">時間</label>
+        <select id="bank_expire_time" name="bank_expire_time">
+        <?php 
+        for ($hour = 0; $hour < 24; $hour++) {
+            for ($minute = 0; $minute < 60; $minute += 30) {
+                $time = sprintf('%02d:%02d', $hour, $minute);
+                $selected = ($bank_expire_time == $time) ? 'selected' : '';
+                echo '<option value="' . $time . '" ' . $selected . '>' . $time . '</option>';
+            }
+        } ?>
+        </select><br>
+        <button id="btn" onclick="document.getElementById('bank_expire_date').value = '';document.getElementById('bank_expire_time').value = '';">clear</button>
+        </div>
+        <?php
+}
+#### 保存時にカスタムフィールドに銀行振込締切を追加 ####
+function save_bank_expire($post_id) {
+    // セキュリティのため追加
+    if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
+    if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
+
+    update_post_meta( $post_id, 'bank_expire_date', $_POST['bank_expire_date'] );
+    update_post_meta( $post_id, 'bank_expire_time', $_POST['bank_expire_time'] );
+}
+add_action('save_post', 'save_bank_expire');
 
 ?>
