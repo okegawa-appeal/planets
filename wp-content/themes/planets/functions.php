@@ -3,6 +3,16 @@
 add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
 function theme_enqueue_styles() {
   wp_enqueue_style( 'style', get_stylesheet_directory_uri() . '/style.css', array(), date("ymdHis", filemtime( get_stylesheet_directory().'/style.css')) );
+  if ( is_page('lottery') ) {
+    wp_enqueue_style( 'animate', get_stylesheet_directory_uri() . '/css/animate.min.css', array( 'style' ) );
+    wp_enqueue_style( 'normalize', get_stylesheet_directory_uri() . '/css/normalize.min.css', array( 'style' ) );
+    wp_enqueue_style( 'lottery', get_stylesheet_directory_uri() . '/css/lottery.css', array( 'style' ) );
+    wp_enqueue_style( 'pagelottery', get_stylesheet_directory_uri() . '/css/page-lottery.css', array( 'style' ) );
+    wp_enqueue_script( 'jquery.min.js', get_stylesheet_directory_uri() . '/js/jquery.min.js');
+//    wp_enqueue_script( 'animatedModal.min.js', get_stylesheet_directory_uri() . '/js/animatedModal.min.js');
+    wp_enqueue_script( 'particles.min.js', 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js');
+    wp_enqueue_script( 'lottery.js', get_stylesheet_directory_uri() . '/js/lottery.js' );
+  }
 }
 
 #### 会員登録必須にするため次へボタンを消す ####
@@ -55,7 +65,7 @@ function download_contents(){
 
   echo '<h3>ダウンロードコンテンツ</h3>';
   echo '<table><tr>';
-  echo '<th scope="row">購入日</th>';
+  echo '<th scope="row">DL期限</th>';
   echo '<th class="num">タイトル</th>';
   echo '<th><a href="#">ダウンロード</a></th>';
         foreach ($results as $row) {
@@ -534,5 +544,47 @@ function save_bank_expire($post_id) {
     update_post_meta( $post_id, 'bank_expire_time', $_POST['bank_expire_time'] );
 }
 add_action('save_post', 'save_bank_expire');
+
+#### 商品画面にくじ引き関連情報を追加 ####
+function add_custom_raffle_metabox() {
+    $itemcode = ''; $page = '';
+    if ( isset($_GET['post']) ) $itemcode = get_post_meta( absint($_GET['post']), '_itemCode', true );
+    if ( isset($_GET['page']) ) $page = $_GET['page'];
+    if ( $page == 'usces_itemedit' || $page == 'usces_itemnew' || $itemcode ) {
+        add_meta_box( 'raffle-metabox', 'くじ引き情報', 'metabox_raffle', 'post', 'side', 'low' );
+    }
+}
+add_action( 'add_meta_boxes', 'add_custom_raffle_metabox' );
+
+function metabox_raffle() {
+        $post_id = get_the_ID();
+        $raffle_use = get_post_meta( $post_id, 'raffle_use', true ); // 現在の値を取得
+        // セキュリティのために追加
+        wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
+        ?>
+        <div class="my-raffle_metabox">
+          <div class="toggle_button">
+            <label for="raffle_use1" class="toggle_label">
+            <input id="raffle_use1" name="raffle_use" class="toggle_input" value="0" type="radio" <?php echo $raffle_use=="0"?'checked':'' ?> /> 設定しない
+            </label><br>
+            <label for="raffle_use2" class="toggle_label">
+            <input id="raffle_use2" name="raffle_use" class="toggle_input" value="1" type="radio" <?php echo $raffle_use=="1"?'checked':'' ?> /> 販売制限付きくじ引き商品に設定する
+            </label><br>
+            <label for="raffle_use3" class="toggle_label">
+            <input id="raffle_use3" name="raffle_use" class="toggle_input" value="2" type="radio" <?php echo $raffle_use=="2"?'checked':'' ?> /> 無制限くじ引き商品に設定する
+            </label><br>
+          </div>
+        </div>
+        <?php
+}
+#### 保存時にカスタムフィールドに銀行振込締切を追加 ####
+function save_raffle($post_id) {
+    // セキュリティのため追加
+    if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
+    if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
+    update_post_meta( $post_id, 'raffle_use', $_POST['raffle_use'] );
+}
+add_action('save_post', 'save_raffle');
+
 
 ?>

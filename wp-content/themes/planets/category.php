@@ -7,18 +7,19 @@
  */
 
 get_header();
-
+global $wpdb;
+global $usces;
 //カテゴリ：を削除
 add_filter( 'get_the_archive_title', function( $title ) {
   return single_cat_title('', false);
 });
 //$category_image = get_term_meta( $item->term_id, 'category-image', true );
-$category_image = get_term_meta( get_queried_object_id(), 'category-image', true );
+$category_id = get_queried_object_id();
+$category_image = get_term_meta( $category_id, 'category-image', true );
 if(!empty($category_image)){
 	$image = $category_image;
 }else{
 	$url = get_pagenum_link();
-	global $wpdb;
 	$query = 'select * FROM wp_pl_event where url = "'.$url.'"';
 	$results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 	$image = $results[0]['image'];
@@ -39,7 +40,77 @@ if(!empty($category_image)){
 				the_archive_description( '<div class="taxonomy-description">', '</div>' );
 				echo '</div>';
 				echo '</div>';
+
+				//くじ引き商品の場合
+				$sql = "select post_id "
+					."FROM wp_term_relationships ,wp_postmeta "
+					."WHERE term_taxonomy_id = $category_id "
+					."and object_id = post_id "
+					."and meta_key = 'raffle_use' " 
+					."and meta_value in ('1','2') ";
+		        $post_id = $wpdb->get_var($sql);
+				if(isset($post_id)){
+					echo '<hr>';
+					$raffle_use = get_post_meta( $post_id, 'raffle_use', true );
+					if($raffle_use) {
+						// TODO:残数が欲しい
+						if(usces_is_login()){
+							$member = $usces->get_member();
+							$query = "SELECT * FROM wp_pl_raffle "
+								."LEFT OUTER JOIN "
+								."(SELECT raffle_id,count(*) as count FROM wp_usces_order,wp_pl_raffle_order "
+								."WHERE mem_id = ".$member['ID'] ." AND wp_usces_order.ID= order_id "
+								."AND post_id = $post_id GROUP BY raffle_id) as result "
+								."ON wp_pl_raffle.ID = result.raffle_id "
+								."WHERE post_id = $post_id "
+								."ORDER BY prize , ID ";
+						}else{
+							$query = "SELECT * FROM wp_pl_raffle "
+								."WHERE post_id = $post_id "
+								."ORDER BY prize , ID ";
+						}
+						$results = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
+						//賞毎に詰め替える
+						$prizelist = array();
+						foreach($results as $result){
+							if(!array_key_exists($result['prize'],$prizelist)){
+								$prizelist[$result['prize']] = array($result);
+							}else{
+								$tmplist = $prizelist[$result['prize']];
+								array_push($tmplist,$result);
+								$prizelist[$result['prize']] = $tmplist;
+							}
+						}
+						echo '<ul>';
+						foreach($prizelist as $prize){
+							$sumrate = 0;
+							echo '<li>';
+							echo '<div>'.$prize[0]['prize'].'賞</div>';
+							echo '<div>'.$prize[0]['prize_name'].'</div>';
+							echo '<ul class="lottery-clearfix">';
+							foreach($prize as $p){
+								$sumrate += $p['rate'];
+								echo '<li class="lottery_image">';
+								echo '<img src="'.$p['prize_image'].'" width="100px">';
+								echo '<div>'.$p['count'].'</div>';
+								if($raffle_use=='1'){
+								echo '<div>残 '.$p['count'].'個</div>';
+								}else{
+								echo '<div>'.$p['rate'].'%</div>';
+								}
+								echo '</li>';
+							}
+							echo '</ul>';
+							if($raffle_use=='2'){
+								echo '<div>'.$sumrate.'%</div>';
+							}
+							echo '</li>';
+						}
+						echo '</ul>';
+					}
+				}
 				?>
+
 			</header><!-- .page-header -->
 
 
@@ -61,10 +132,14 @@ if(!empty($category_image)){
 							</div>
 							<div class="iteminfo">
 								<div class="itemname"><a href="<?php the_permalink(); ?>"  rel="bookmark"><?php usces_the_itemName(); ?></a></div>
+							<?php 
+							if(count(wel_get_skus(get_the_ID()))==1){
+							?>
 								<div class="itemprice">
 									<?php usces_the_firstPriceCr(); ?><?php usces_guid_tax(); ?>
 								</div>
 								<?php usces_crform_the_itemPriceCr_taxincluded(); ?>
+							<?php } ?>
 							</div>
 							<?php if ( ! usces_have_zaiko_anyone() ) : ?>
 								<div class="itemsoldout">
