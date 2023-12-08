@@ -379,7 +379,7 @@ function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
         if(isset($bookendid) && !empty($bookendid)){
           if($bookendid != 'Array'){
               //bookend登録処理
-            bookend_entry_data($email,$bookendid);
+            bookend_entry_data($email,$bookendid,$cart['post_id']);
           }
         }
       }
@@ -484,6 +484,7 @@ function save_expire($post_id) {
 
     update_post_meta( $post_id, 'expire_date', $_POST['expire_date'] );
     update_post_meta( $post_id, 'expire_time', $_POST['expire_time'] );
+
     if ( isset( $_POST['expire_date'] )  && !empty($_POST['expire_date'])) {
         $time_stamp = strtotime($_POST['expire_date'] . ' ' . $_POST['expire_time'] . ' JST');
         wp_schedule_single_event($time_stamp, 'do_expire_post', array($post_id));
@@ -585,6 +586,51 @@ function save_raffle($post_id) {
     update_post_meta( $post_id, 'raffle_use', $_POST['raffle_use'] );
 }
 add_action('save_post', 'save_raffle');
+
+#### 会員情報に生年月日を追加 ####
+add_filter( 'usces_filter_custom_field_input',  'my_filter_custom_field_input', 10, 4 );
+function my_filter_custom_field_input( $html, $data, $custom_field, $position ) {
+    $html = preg_replace('/<input type="text" name="custom_member\[birthday\]"([^>]*)>/i', '<input type="date" name="custom_member[birthday]"$1>', $html);
+    return $html;
+}
+
+#### 商品画面にbookend metaboxを追加 ####
+function add_custom_bookend_metabox() {
+    $itemcode = ''; $page = '';
+    if ( isset($_GET['post']) ) $itemcode = get_post_meta( absint($_GET['post']), '_itemCode', true );
+    if ( isset($_GET['page']) ) $page = $_GET['page'];
+    if ( $page == 'usces_itemedit' || $page == 'usces_itemnew' || $itemcode ) {
+        add_meta_box( 'bookend-metabox', '電子書籍情報', 'metabox_bookend', 'post', 'side', 'low' );
+    }
+}
+add_action( 'add_meta_boxes', 'add_custom_bookend_metabox' );
+
+function metabox_bookend() {
+        $post_id = get_the_ID();
+        $contentsid = get_post_meta( $post_id, 'contentsid', true ); // 現在の値を取得
+        $publish_date = get_post_meta( $post_id, 'publish_date', true ); // 現在の値を取得
+        // セキュリティのために追加
+        wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
+        ?>
+        <div class="my-bookend_metabox">
+            <label for="contentsid" class="toggle_label">contents ID</label>
+            <input id="contentsid" name="contentsid" value="<?php echo $contentsid ?>" type="text"> 
+            </label><br>
+            <label for="publish_date" class="toggle_label">公開日</label>
+            <input id="publish_date" name="publish_date" value="<?php echo $publish_date ?>" type="date" >
+            <br>
+        </div>
+        <?php
+}
+#### 保存時にカスタムフィールドに銀行振込締切を追加 ####
+function save_bookend($post_id) {
+    // セキュリティのため追加
+    if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
+    if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
+    update_post_meta( $post_id, 'contentsid', $_POST['contentsid'] );
+    update_post_meta( $post_id, 'publish_date', $_POST['publish_date'] );
+}
+add_action('save_post', 'save_bookend');
 
 
 ?>
