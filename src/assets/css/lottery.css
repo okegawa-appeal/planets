@@ -177,105 +177,42 @@ body {
 /* バッチ背景色 */
 .award--A {
   background: linear-gradient(
-    45deg,
-    #ff6570 0%,
-    #fc65ff 20%,
-    #4f86ff 40%,
-    #03fff7 50%,
-    #03ff54 65%,
-    #fdff00 80%,
-    #ff9b42 100%
+    143deg,
+    #eed6ea 14.7%,
+    #ebe6e2 25.07%,
+    #e8edda 35.43%,
+    #caffdf 46.54%,
+    #bff0ff 57.65%,
+    #e3c5f9 72.08%,
+    #f5c8c8 85.78%
   );
 }
 .award--B {
-  background: linear-gradient(
-    45deg,
-    #b67b03 0%,
-    #daaf08 45%,
-    #fee9a0 70%,
-    #daaf08 85%,
-    #b67b03 90% 100%
-  );
+  background: linear-gradient(143deg, #fcffdd 14.7%, #ffdf8d 85.78%);
 }
 .award--C {
-  background: linear-gradient(
-    45deg,
-    #9da1a6 0%,
-    #e2e2e2 45%,
-    #979c9a 70%,
-    #989898 85%,
-    #dcdddd 90% 100%
-  );
+  background: linear-gradient(143deg, #f4f4f4 14.7%, #c7c7cb 85.78%);
 }
 .award--D {
-  background: linear-gradient(
-    45deg,
-    #8d551d 0%,
-    #b16a23 45%,
-    #e2aa72 70%,
-    #eabf95 85%,
-    #8d551d 90% 100%
-  );
+  background: linear-gradient(143deg, #fdf5eb 14.7%, #d8bd9d 85.78%);
 }
 .award--E {
-  background: linear-gradient(
-    45deg,
-    #ff8888 0%,
-    #ffa6a6 45%,
-    #ffc1c1 70%,
-    #ff9696 85%,
-    #ff8888 90% 100%
-  );
+  background: linear-gradient(143deg, #fafafa 14.7%, #ffdfdf 85.78%);
 }
 .award--F {
-  background: linear-gradient(
-    45deg,
-    #d773dd 0%,
-    #f1d3fb 45%,
-    #dfa9f3 70%,
-    #dfa9f3 85%,
-    #d773dd 90% 100%
-  );
+  background: linear-gradient(143deg, #fff9fe 14.7%, #fde7ff 85.78%);
 }
 .award--G {
-  background: linear-gradient(
-    45deg,
-    #6e7fcd 0%,
-    #d0d8ff 45%,
-    #a9b6f3 70%,
-    #9faded 85%,
-    #6e7fcd 90% 100%
-  );
+  background: linear-gradient(143deg, #f8faff 14.7%, #d3dff7 85.78%);
 }
 .award--H {
-  background: linear-gradient(
-    45deg,
-    #6acbaa 0%,
-    #d1feef 45%,
-    #a9f3da 70%,
-    #8fdfc4 85%,
-    #6acbaa 90% 100%
-  );
+  background: linear-gradient(143deg, #f3fff4 14.7%, #cff0d9 85.78%);
 }
 .award--I {
-  background: linear-gradient(
-    45deg,
-    #a9e273 0%,
-    #ddfdc0 45%,
-    #cdf3a9 70%,
-    #b5df8d 85%,
-    #a9e273 90% 100%
-  );
+  background: linear-gradient(143deg, #fbffec 14.7%, #e7f2c9 85.78%);
 }
 .award--J {
-  background: linear-gradient(
-    45deg,
-    #565656 0%,
-    #a7a8aa 45%,
-    #6e6e6e 70%,
-    #6e6e6e 85%,
-    #565656 90% 100%
-  );
+  background: linear-gradient(143deg, #fafcea 14.7%, #dcdfbe 85.78%);
 }
 .award--badge p {
   position: relative;
