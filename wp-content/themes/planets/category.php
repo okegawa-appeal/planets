@@ -85,16 +85,19 @@ if(!empty($category_image)){
 						foreach($prizelist as $prize){
 							$sumrate = 0;
 							echo '<li>';
-							echo '<div>'.$prize[0]['prize'].'賞</div>';
+							echo '<div class="award--badge">'.$prize[0]['prize'].'賞</div>';
 							echo '<div>'.$prize[0]['prize_name'].'</div>';
 							echo '<ul class="lottery-clearfix">';
 							foreach($prize as $p){
 								$sumrate += $p['rate'];
 								echo '<li class="lottery_image">';
 								echo '<img src="'.$p['prize_image'].'" width="100px">';
-								echo '<div>'.$p['count'].'</div>';
 								if($raffle_use=='1'){
-								echo '<div>残 '.$p['count'].'個</div>';
+									if($p['count'] != 0){
+										echo '<div>残 '.$p['count'].'個</div>';
+									}else{
+										echo '<div>売り切れ</div>';
+									}
 								}else{
 								echo '<div>'.$p['rate'].'%</div>';
 								}

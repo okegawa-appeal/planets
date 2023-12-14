@@ -80,13 +80,26 @@ $(function () {
         $(".award--photo").on("animationend webkitAnimationEnd", () => {
             $(".award--badge").css({ display: "flex" });
             $(".award--infomation").show();
-            $(".award--close").show();
+            //            $(".award--close").show();
             $(".award--badge").addClass("animate__bounceIn");
 
             $(".award--infomation").addClass("animate__bounceIn");
-            $(".award--close").addClass("animate__bounceIn");
+            //            $(".award--close").addClass("animate__bounceIn");
         });
         $(".snav").hide();
+        var id = $(event.currentTarget).data("index");
+        var order_id = $(event.currentTarget).data("order");
+        console.log(order_id);
+        var hostUrl = 'https://' + location.host + '/wp-json/raffle/v1/open/'
+        console.log(hostUrl);
+        $.ajax({
+            url: hostUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: { id: id, o: order_id },
+            timeout: 3000,
+        })
+
         $award = $(event.currentTarget).data("award");
         $image = $(event.currentTarget).data("image");
         $description = $(event.currentTarget).data("description");

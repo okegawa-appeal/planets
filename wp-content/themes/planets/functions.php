@@ -3,6 +3,8 @@
 add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
 function theme_enqueue_styles() {
   wp_enqueue_style( 'style', get_stylesheet_directory_uri() . '/style.css', array(), date("ymdHis", filemtime( get_stylesheet_directory().'/style.css')) );
+
+  //くじ引き結果画面のみJS/CSSを追加
   if ( is_page('lottery') ) {
     wp_enqueue_style( 'animate', get_stylesheet_directory_uri() . '/css/animate.min.css', array( 'style' ) );
     wp_enqueue_style( 'normalize', get_stylesheet_directory_uri() . '/css/normalize.min.css', array( 'style' ) );
@@ -35,7 +37,7 @@ function add_custom_menu() {
 }
 add_action('admin_menu', 'add_custom_menu');
 
-#### お問い合わせに自動登録 ####
+#### お問い合わせに会員情報自動登録 ####
 function my_form_tag_filter($tag){
 	if ( !is_array( $tag ) )
 	return $tag;
@@ -60,6 +62,7 @@ add_filter('wpcf7_form_tag', 'my_form_tag_filter', 11);
 function download_contents(){
   global $wpdb;
   $table_name = $wpdb->prefix . 'pl_dl_contents';
+  //TODO: 未公開をフィルタさせる
   $query = "SELECT * FROM $table_name where email ='".usces_memberinfo( 'mailaddress1' ,'return')."' order by id desc";
   $results = $wpdb->get_results($query, ARRAY_A);
 
@@ -79,7 +82,6 @@ function download_contents(){
 add_action('usces_action_memberinfo_page_header','download_contents');
 
 #### カテゴリページに画像を追加 ####
-// カテゴリー一覧ページの新規追加エリアに要素を追加するフック
 add_action( 'category_add_form_fields', 'my_category_add_form_fields' );
 function my_category_add_form_fields( $taxonomy ) {
   ?>
@@ -260,6 +262,7 @@ function my_the_payment_method($payments, $value){
           }
         }
       }
+
       if(in_array($sku, $mysku)){
         echo 'testモード';
         echo 'この表示が出たら決済が正しく行われません。';
@@ -305,7 +308,7 @@ function getcatorder( $query ) {
 	}
 }
 
-#### 保存時にカスタムフィールドに商品コードを追加し、ソート可能とする ####
+#### カテゴリ中の商品ソート用にitemcodeをmetaに保存 ####
 add_action( 'pre_get_posts', 'getcatorder' );
 
 function set_custom_field( $post_id, $post ) {
@@ -373,6 +376,28 @@ function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
   $payment = $entries['order']['payment_name'];
   foreach($carts as $cart){
     $sku = wel_get_sku($cart['post_id'],$cart['sku']);
+    //TODO: metaからラッフル商品を取得し、購入数に合わせてくじ引き用商品を確保する
+    $raffle_use = get_post_meta($cart['post_id'], 'raffle_use', true ); // 現在の値を取得
+
+    if($raffle_use == '1' || $raffle_use == '2'){
+      $order_id = $entries['order']['ID'];
+      $itemcount = 0;
+      //$skuの種類 x 販売個数
+      if(substr($sku['code'],-strlen("1")) === "1"){
+        $itemcount = 1;
+      } else if(substr($sku['code'],-strlen("10")) === "10"){
+        //10回券購入
+        $itemcount = 10;
+      }
+      echo $raffle_use;
+      if($raffle_use == '2'){
+        purchase_nolimit($cart['post_id'],$order_id,$itemcount);
+      }else{
+        echo "まだサポートしていません";
+      }
+    }
+
+    //bookend商品登録
     $bookendid = trim($sku['advance']);
     if($payment=='クレジット決済'){
       if(!is_array($bookendid)){
@@ -450,30 +475,39 @@ function add_custom_metabox() {
 add_action( 'add_meta_boxes', 'add_custom_metabox' );
 
 function metabox_expire() {
-        $post_id = get_the_ID();
-        $expire_date = get_post_meta( $post_id, 'expire_date', true ); // 現在の値を取得
-        $expire_time = get_post_meta( $post_id, 'expire_time', true ); // 現在の値を取得
+  $post_id = get_the_ID();
+  $expire_date = get_post_meta( $post_id, 'expire_date', true ); // 現在の値を取得
+  $expire_time = get_post_meta( $post_id, 'expire_time', true ); // 現在の値を取得
 
-        // セキュリティのために追加
-        wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
-        ?>
-        <div class="my-metabox">
-        <label for="expire_date">日付</label></td><td>
-        <input type="date" name="expire_date" size=50 id="expire_date" value="<?php echo $expire_date; ?>"><br>
-        <label for="expire_time">時間</label>
-        <select id="expire_time" name="expire_time">
-        <?php 
-        for ($hour = 0; $hour < 24; $hour++) {
-            for ($minute = 0; $minute < 60; $minute += 30) {
-                $time = sprintf('%02d:%02d', $hour, $minute);
-                $selected = ($expire_time == $time) ? 'selected' : '';
-                echo '<option value="' . $time . '" ' . $selected . '>' . $time . '</option>';
-            }
-        } ?>
-        </select><br>
-        <button id="btn" onclick="document.getElementById('expire_date').value = '';document.getElementById('expire_time').value = '';">clear</button>
-        </div>
-        <?php
+  $next_scheduled_time = wp_next_scheduled('do_expire_post',array($post_id));
+  if(!empty($next_scheduled_time)){
+    $timezone = new DateTimeZone('Asia/Tokyo');
+    $next_scheduled_datetime = new DateTime('@' . $next_scheduled_time);
+    $next_scheduled_datetime->setTimezone($timezone);
+    $next_scheduled_jst = $next_scheduled_datetime->format('Y-m-d H:i:s');
+  }
+  echo '次回非公開時刻: ' . $next_scheduled_jst;
+
+  // セキュリティのために追加
+  wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
+  ?>
+  <div class="my-metabox">
+  <label for="expire_date">日付</label></td><td>
+  <input type="date" name="expire_date" size=50 id="expire_date" value="<?php echo $expire_date; ?>"><br>
+  <label for="expire_time">時間</label>
+  <select id="expire_time" name="expire_time">
+  <?php 
+  for ($hour = 0; $hour < 24; $hour++) {
+      for ($minute = 0; $minute < 60; $minute += 30) {
+          $time = sprintf('%02d:%02d', $hour, $minute);
+          $selected = ($expire_time == $time) ? 'selected' : '';
+          echo '<option value="' . $time . '" ' . $selected . '>' . $time . '</option>';
+      }
+  } ?>
+  </select><br>
+  <button id="btn" onclick="document.getElementById('expire_date').value = '';document.getElementById('expire_time').value = '';">clear</button>
+  </div>
+  <?php
 }
 
 #### 保存時にカスタムフィールドに公開停止日時を登録＆cronに登録 ####
@@ -485,6 +519,9 @@ function save_expire($post_id) {
     update_post_meta( $post_id, 'expire_date', $_POST['expire_date'] );
     update_post_meta( $post_id, 'expire_time', $_POST['expire_time'] );
 
+    //TODO: 保存したが、聞かない場合がある。
+    //https://teratail.com/questions/srif6om25hbh2o
+    // 登録内容を表示させる様にしたため一旦スルー
     if ( isset( $_POST['expire_date'] )  && !empty($_POST['expire_date'])) {
         $time_stamp = strtotime($_POST['expire_date'] . ' ' . $_POST['expire_time'] . ' JST');
         wp_schedule_single_event($time_stamp, 'do_expire_post', array($post_id));
@@ -560,6 +597,14 @@ add_action( 'add_meta_boxes', 'add_custom_raffle_metabox' );
 function metabox_raffle() {
         $post_id = get_the_ID();
         $raffle_use = get_post_meta( $post_id, 'raffle_use', true ); // 現在の値を取得
+        if($raffle_use == '1' || $raffle_use == '2'){
+          $skus = wel_get_skus($post_id);
+          foreach($skus as $sku){
+            if(substr($sku['code'],-strlen("1")) !== "1" &&substr($sku['code'],-strlen("10")) !== "10"  ){
+              echo '<font color="red">くじ引きを行う際はSKUの末尾は1もしくは10の設定だけにしてください。</font>';
+            }
+          }
+        }
         // セキュリティのために追加
         wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
         ?>
@@ -584,6 +629,7 @@ function save_raffle($post_id) {
     if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
     if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
     update_post_meta( $post_id, 'raffle_use', $_POST['raffle_use'] );
+    
 }
 add_action('save_post', 'save_raffle');
 
@@ -613,9 +659,6 @@ function metabox_bookend() {
         wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
         ?>
         <div class="my-bookend_metabox">
-            <label for="contentsid" class="toggle_label">contents ID</label>
-            <input id="contentsid" name="contentsid" value="<?php echo $contentsid ?>" type="text"> 
-            </label><br>
             <label for="publish_date" class="toggle_label">公開日</label>
             <input id="publish_date" name="publish_date" value="<?php echo $publish_date ?>" type="date" >
             <br>
@@ -627,7 +670,6 @@ function save_bookend($post_id) {
     // セキュリティのため追加
     if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
     if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
-    update_post_meta( $post_id, 'contentsid', $_POST['contentsid'] );
     update_post_meta( $post_id, 'publish_date', $_POST['publish_date'] );
 }
 add_action('save_post', 'save_bookend');

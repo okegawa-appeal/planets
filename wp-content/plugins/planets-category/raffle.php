@@ -353,7 +353,7 @@ function test_purchase($post_id,$order_id,$itemcount) {
     }
 }
 // テスト購入(販売制限なし)
-function test_purchase_nolimit($post_id,$order_id,$itemcount) {
+function purchase_nolimit($post_id,$order_id,$itemcount) {
     global $wpdb;
     for($i = 0;$i < $itemcount ; $i++) {
 /*        $sql ="insert into wp_pl_raffle_order(post_id,raffle_id,order_id) "
@@ -372,7 +372,7 @@ function test_purchase_nolimit($post_id,$order_id,$itemcount) {
             ."(select rand()*100 rand) as b1  "
             ."where b0.sum >= b1.rand  "
             ."limit 1";
-
+        echo $sql;
         $wpdb->query($sql);
         
         if ($result === false) {
@@ -490,7 +490,7 @@ function planets_raffle_contents() {
                 $post_id = intval($_POST['post_id']);
                 $order_id = intval($_POST['order_id']);
                 $itemcount = $_POST['itemcount'];
-                test_purchase_nolimit($post_id,$order_id,$itemcount);
+                purchase_nolimit($post_id,$order_id,$itemcount);
             } elseif ($action === 'purchase_reset') {
                 $post_id = intval($_POST['post_id']);
                 if($raffle_use == '1'){
