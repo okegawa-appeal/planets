@@ -147,7 +147,7 @@ $open = $_GET['open'];
                                         echo '<div class="lottery-image">';
                                         echo '<img src="'.get_stylesheet_directory_uri().'/images/lotteryimage.png" />';
                                         echo '</div>';
-                                        echo '<p class="lottery-title">'.$row['itemName'].' </p>';
+                                        echo '<p class="lottery-title">'.$row['itemName'].$row['prize'].' </p>';
                                         echo '<p class="lottery-title">'.$row['order_date'].' 購入</p>';
                                         echo '</button></li>';
                                 }
