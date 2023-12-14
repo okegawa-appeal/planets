@@ -1,0 +1,186 @@
+.description-accordion {
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+  transition: 0.5s;
+}
+.description-accordion.description-accordion_open {
+  height: 100%;
+}
+.description-accordion::after {
+  width: 100%;
+  height: 100px;
+  content: " ";
+  display: block;
+  background: linear-gradient(180deg, rgba(244, 244, 244, 0) 0%, #f4f4f4 100%);
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+}
+.description-accordion.description-accordion_open::after {
+  display: none;
+}
+.btn-more {
+}
+.btn-more .close {
+  display: none;
+}
+.btn-more.on-more .more {
+  display: none;
+}
+.btn-more.on-more .close {
+  display: inline;
+}
+
+/* レイアウトcss */
+.awards {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  background-color: #fff;
+  max-width: 1200px;
+  width: 100%;
+  padding: 25px 0;
+}
+.award--badge {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: solid 2px #fff;
+  margin: -30px;
+  text-align: center;
+  line-height: 70px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.award--probability {
+  position: absolute;
+  right: 0;
+  color: #ff0000;
+  font-size: 0.7rem;
+  margin: -25px 0 0 0;
+}
+.award__A .award--header,
+.award__A .award--badge {
+  background: linear-gradient(
+    143deg,
+    #eed6ea 14.7%,
+    #ebe6e2 25.07%,
+    #e8edda 35.43%,
+    #caffdf 46.54%,
+    #bff0ff 57.65%,
+    #e3c5f9 72.08%,
+    #f5c8c8 85.78%
+  );
+}
+.award__B .award--header,
+.award__B .award--badge {
+  background: linear-gradient(143deg, #fcffdd 14.7%, #ffdf8d 85.78%);
+}
+.award__C .award--header,
+.award__C .award--badge {
+  background: linear-gradient(143deg, #f4f4f4 14.7%, #c7c7cb 85.78%);
+}
+.award__D .award--header,
+.award__D .award--badge {
+  background: linear-gradient(143deg, #fdf5eb 14.7%, #d8bd9d 85.78%);
+}
+.award__E .award--header,
+.award__E .award--badge {
+  background: linear-gradient(143deg, #fafafa 14.7%, #ffdfdf 85.78%);
+}
+.award__F .award--header,
+.award__F .award--badge {
+  background: linear-gradient(143deg, #fff9fe 14.7%, #fde7ff 85.78%);
+}
+.award__G .award--header,
+.award__G .award--badge {
+  background: linear-gradient(143deg, #f8faff 14.7%, #d3dff7 85.78%);
+}
+.award__H .award--header,
+.award__H .award--badge {
+  background: linear-gradient(143deg, #f3fff4 14.7%, #cff0d9 85.78%);
+}
+.award__I .award--header,
+.award__I .award--badge {
+  background: linear-gradient(143deg, #fbffec 14.7%, #e7f2c9 85.78%);
+}
+.award__J .award--header,
+.award__J .award--badge {
+  background: linear-gradient(143deg, #fafcea 14.7%, #dcdfbe 85.78%);
+}
+
+.award--probability em {
+  color: #ff0000;
+  font-size: 140%;
+  font-weight: bold;
+}
+.awards li {
+  width: 250px;
+  margin: 0 24px 30px 24px;
+}
+.awards li img {
+  width: 100%;
+}
+.award--title {
+  margin: 10px 0;
+}
+.award--infomation {
+  color: #ff0000;
+}
+/* Aパターン */
+.design-pattern__group section {
+  margin: 50px 0;
+}
+.design-pattern__group .award--header {
+  position: relative;
+  height: 10px;
+}
+.design-pattern__group .award--lineup {
+  position: absolute;
+  font-weight: bold;
+  margin: -23px 0 0 40px;
+}
+/* Bパターン */
+.design-pattern__single {
+  margin: 70px 0;
+}
+.design-pattern__single section {
+  background: #26a69a;
+  margin: 0 calc(50% - 50vw);
+  width: 100vw;
+}
+.design-pattern__single ul {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.design-pattern__single .award--header {
+  padding: 40px 0;
+}
+.design-pattern__single .award--lineup {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+.design-pattern__single .container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+.design-pattern__single .award--header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+}
+.design-pattern__single .award--header .award--lineup {
+  width: 200px;
+}
+.design-pattern__single .award--header::after {
+  border-top: 3px double black;
+  content: " ";
+  width: 100%;
+  height: 3px;
+  display: block;
+}
