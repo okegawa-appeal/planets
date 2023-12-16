@@ -114,6 +114,22 @@ $(function () {
             $(".js-hide-contents").hide();
         });
         $("#SkyInner").addClass("start");
+        $(".night").addClass(`award-${$award}`);
+        if ($award == "A") {
+            mainStars.particles.color.value = [
+                "#ff6570",
+                "#fc65ff",
+                "#4f86ff",
+                "#03fff7",
+                "#03ff54",
+                "#fdff00",
+                "#ff9b42",
+            ];
+            mainStars.particles.opacity.anim.speed = 6;
+        } else if ($award == "B" || $award == "C" || $award == "D") {
+            mainStars.particles.color.value = ["#fff000", "#FF9393"];
+            mainStars.particles.opacity.anim.speed = 3;
+        }
         particlesJS("Stars", mainStars);
     });
     particlesJS("MainVisual", mainStars);
