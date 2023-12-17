@@ -114,7 +114,8 @@ function planets_bookend_entry() {
     if ($action === 'create') {
         $email = $_POST['email'];
 		$bookendid = $_POST['bookendid'];
-        $result = bookend_entry_data($email, $bookendid);
+		$post_id = $_POST['post_id'];
+        $result = bookend_entry_data($email, $bookendid,$post_id);
         // 画面にメッセージを表示
 		$message_html =<<<EOF
 			
@@ -148,6 +149,9 @@ EOF;
         <label for="bookendid">bookendid</label></td><td>
         <input type="text" name="bookendid" size=50 id="bookendid" required>
         </td></tr><tr><td>
+        <label for="post_id">post_id</label></td><td>
+        <input type="text" name="post_id" size=50 id="post_id" required>
+        </td></tr><tr><td>
         <input type="hidden" name="action" value="create">
         <input type="submit" value="登録">
         </td></tr>
@@ -162,7 +166,7 @@ EOF;
 
 }
 // データを読み取り
-function bookend_entry_data($email,$bookendid) {
+function bookend_entry_data($email,$bookendid,$post_id) {
 	## bookend ユーザー取得
 	$getuserurl = 'https://license.keyring.net/BookEnd/api/v1.0/GetUserID';
 	$args = array(
@@ -194,6 +198,22 @@ function bookend_entry_data($email,$bookendid) {
 	$data = json_decode( $json, true );
 	$userid = $data['UserID'];
 
+	$publish_date = get_post_meta( $post_id, 'publish_date', true ); // 現在の値を取得
+	$body = array(
+			'OwnerLoginName' => 'double',
+			'OwnerPassword' => 'D9yEpTJf',
+			'UserID' => $userid,
+			'ContentsID' => $bookendid
+	);
+	if(!empty($publish_date)){
+		$jstTimeZone = new DateTimeZone('Asia/Tokyo');
+		$jstDateTime = new DateTime($publish_date." 00:00:00", $jstTimeZone);
+		$utcTimeZone = new DateTimeZone('UTC');
+		$jstDateTime->setTimezone($utcTimeZone);
+		$utcDateString = $jstDateTime->format('Y-m-d H:i:s');
+		$body['PublishDate'] = $utcDateString;
+	}
+
 	## bookend コンテンツ紐付け
 	$addcontentsurl = 'https://license.keyring.net/BookEnd/cloudlib/api/v1.0/AddContents';
 	$args = array(
@@ -202,12 +222,7 @@ function bookend_entry_data($email,$bookendid) {
 		'headers'  => array(
 				'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8',
 		),
-		'body' => array(
-			'OwnerLoginName' => 'double',
-			'OwnerPassword' => 'D9yEpTJf',
-			'UserID' => $userid,
-			'ContentsID' => $bookendid
-		)
+		'body' => $body
 	);
 	$response 	= wp_remote_post( $addcontentsurl, $args );
 	$result = $result . "<br><br>";

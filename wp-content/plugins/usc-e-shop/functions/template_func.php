@@ -3330,7 +3330,8 @@ function usces_custom_field_input( $data, $custom_field, $position, $out = '' ) 
 			}
 		}
 	}
-
+	echo $html;
+	
 	$html = apply_filters( 'usces_filter_custom_field_input', $html, $data, $custom_field, $position );
 
 	if ( 'return' === $out ) {

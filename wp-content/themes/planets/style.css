@@ -205,6 +205,7 @@ td.column-description {
 .announce_container .announce_news ul li .announce_news_title{
 	font-size:1rem;
 }
+
 @media (min-width: 800px) {
 .announce_container .announce_news{
 	width:45%;
@@ -222,6 +223,21 @@ td.column-description {
   flex-wrap: wrap;
 }
 }
+
+.lottery-clearfix{
+	display: flex;
+    flex-flow: row wrap;
+    justify-content: start;
+}
+.lottery_image{
+    padding: 8px 10px;         /* 箱の大きさ調整 */
+    width: 120px;               /* 箱の大きさ調整 */
+    text-align: center;         /* テキストをセンタリング */
+    background-color:  #fff;    /* 背景色設定 */
+    margin: 5px;                /* 箱と箱の間を開ける */
+	display:block;
+}
+
 /* =Reset
 -------------------------------------------------------------- */
 
@@ -628,6 +644,7 @@ textarea {
 }
 
 input[type="text"],
+input[type="date"],
 input[type="password"],
 input[type="email"],
 input[type="tel"],

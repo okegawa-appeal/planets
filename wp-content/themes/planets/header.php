@@ -58,6 +58,7 @@
 							<?php if ( usces_is_login() ) : ?>
 								<li><?php printf( __( 'Hello %s', 'usces' ), usces_the_member_name( 'return' ) ); // phpcs:ignore ?></li>
 								<li><a href="<?php echo esc_url( USCES_MEMBER_URL ); ?>"><?php esc_html_e( 'My page', 'welcart_basic' ); ?></a></li>
+								<li><a href="<?php echo home_url( 'lottery' ); ?>">PLANETSくじ結果</a></li>
 								<?php do_action( 'usces_theme_login_menu' ); ?>
 								<li><?php usces_loginout(); ?></li>
 							<?php else : ?>

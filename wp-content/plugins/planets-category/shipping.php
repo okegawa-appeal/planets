@@ -170,7 +170,7 @@ function pl_shipping_page_content()
         ?>
         <input type="submit" name="bulk_open" class="button" value="発送完了登録">
         <hr><br>
-        <textarea name="messagebody" rows="10" cols="50">発送いたしました。配送会社の状況はマイページよりご確認ください。</textarea>
+        <textarea name="messagebody" rows="10" cols="50">ご注文の商品を発送いたしました。配送会社の状況はマイページよりご確認ください。</textarea>
         <input type="submit" name="sendshippingdlmail" class="button" value="メール送信">
     </form>
     <?php
@@ -259,7 +259,7 @@ function send_shipping_mail($ids,$messagebody){
 
 	$para1 = array(
 		'to_name'      => "PLANETS",
-		'to_address'   => "noreply@planets-w.jp",
+		'to_address'   => "staff@planets-w.jp",
 		'from_name'    => get_option( 'blogname' ),
 		'from_address' => $usces->options['sender_mail'],
 		'return_path'  => $usces->options['sender_mail'],

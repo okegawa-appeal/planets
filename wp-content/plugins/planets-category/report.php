@@ -74,12 +74,14 @@ class PL_ReportDetail_Table extends WP_List_Table
     function get_columns()
     {
         return array(
-            'item_code' => 'item_code',
-            'item_name' => 'item_name',
-            'order_payment_name' => 'order_payment_name',
-            'order_status' => 'order_status',
-			'price' => 'price',
-			'count' => 'count'
+            'item_code' => '商品コード',
+            'item_name' => '商品名',
+            'name' => 'SKU名',
+            'order_payment_name' => '支払い方法',
+            'order_status' => 'ステータス',
+			'price' => '単価',
+			'count' => '個数',
+			'total' => '小計(税込)'
         );
     }
 
@@ -95,13 +97,15 @@ class PL_ReportDetail_Table extends WP_List_Table
             $offset = ($current_page - 1) * $per_page;
 
             $sql = "select "
-            ."item_name,item_code,order_payment_name,order_status,sum(price) as price,count(*) as count "
-            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order  "  
+            ."item_name,item_code,wp_usces_skus.name,order_payment_name,order_status,sum(wp_usces_skus.price*quantity) as total,wp_usces_skus.price,SUM(quantity) as count "
+            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order,wp_usces_skus  "  
             ."where  "
             ." wp_term_relationships.term_taxonomy_id = $term_id " 
             ." and wp_usces_ordercart.post_id = wp_term_relationships.object_id "
             ." and wp_usces_order.ID= wp_usces_ordercart.order_id "
-            ." group by item_name,item_code,order_payment_name,order_status ";
+            ." and wp_usces_ordercart.sku_code = wp_usces_skus.code "
+            ." and wp_usces_ordercart.post_id = wp_usces_skus.post_id "
+            ." group by item_name,item_code,wp_usces_skus.name,wp_usces_skus.price,order_payment_name,order_status ";
 
             $total_items = $wpdb->get_var($sql);
             $this->set_pagination_args(array(
@@ -134,7 +138,7 @@ class PL_ReportDetail_Table extends WP_List_Table
         if(!empty($_GET['term_id'])){
             $term_id = $_GET['term_id'];
             $sql = "select "
-            ."sum(price) as price "
+            ."sum(price*quantity) as price "
             ."FROM wp_term_relationships,wp_usces_ordercart  "
             ."where   "
             ."wp_term_relationships.term_taxonomy_id = $term_id  "
@@ -143,22 +147,47 @@ class PL_ReportDetail_Table extends WP_List_Table
         }
         return $data;
     }
+    private function calculate_total_omit_cancel() {
+        global $wpdb;
+        if(!empty($_GET['term_id'])){
+            $term_id = $_GET['term_id'];
+            $sql = "select "
+            ."sum(price*quantity) as price "
+            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order  "
+            ."where   "
+            ."wp_term_relationships.term_taxonomy_id = $term_id  "
+            ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  "
+            ."and wp_usces_order.ID= wp_usces_ordercart.order_id "
+            ."and order_status not like '%cancel%' " ;
+            $data = $wpdb->get_results($sql , ARRAY_A);
+        }
+        return $data;
+    }
 
     public function display() {
         // 合計値を計算
         $data = $this->calculate_total();
+        $data2 = $this->calculate_total_omit_cancel();
 
         // テーブルを表示
         parent::display();
 
         // 合計値を表示
         echo '合計: ' . "¥".number_format($data[0]['price'],0);
+        echo '<hr>';
+        // 合計値を表示
+        echo '合計(キャンセル除く): ' . "¥".number_format($data2[0]['price'],0);
     }
 
     function column_Price($item)
     {
         $price = "¥".number_format($item['price'],0); // 例: 1234.56 を 1,234.56 に変換
         return $price;
+    }
+    function column_Total($item)
+    {
+        $total = "¥".number_format($item['total'],0); // 例: 1234.56 を 1,234.56 に変換
+        return $total;
     }
 
     function column_Order_Status($item){
@@ -177,8 +206,10 @@ class PL_ReportDetail_Table extends WP_List_Table
             'name' => array('name', false),
             'item_code' => array('item_code', false),
             'item_name' => array('item_name', false),
+            'name' => array('name', false),
             'order_payment_name' => array('order_payment_name', false),
             'order_status' => array('order_status', false),
+            'total' => array('total', false),
             'price' => array('price', false),
             'count' => array('count', false),
         );

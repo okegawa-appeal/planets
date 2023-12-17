@@ -20,7 +20,7 @@ class PL_DL_Contents_List_Table extends WP_List_Table
             'cb' => '<input type="checkbox" />',
             'id' => 'ID',
             'status' => 'status',
-            'purchase_date' => '購入日',
+            'purchase_date' => 'DL期限',
             'item_name' => '商品名',
             'path' => 'パス',
             'email' => 'メール',
@@ -211,7 +211,7 @@ function dl_page_content()
     echo '<table>';
     echo '<input type="hidden" name="action" value="create">';
     echo '<tr><td>';
-    echo '<label for="purchase_date">購入日:</label></td><td><input type="date" name="purchase_date" required></td></tr>';
+    echo '<label for="purchase_date">DL期限:</label></td><td><input type="date" name="purchase_date" required></td></tr>';
     echo '<tr><td>';
     echo '<label for="item_name">商品名:</label></td><td><input type="text" name="item_name" required></td></tr>';
     echo '<tr><td>';
@@ -317,7 +317,7 @@ function send_dl_mail($ids,$messagebody){
 
 	$para1 = array(
 		'to_name'      => "PLANETS",
-		'to_address'   => "noreply@planets-w.jp",
+		'to_address'   => "staff@planets-w.jp",
 		'from_name'    => get_option( 'blogname' ),
 		'from_address' => $usces->options['sender_mail'],
 		'return_path'  => $usces->options['sender_mail'],

@@ -43,6 +43,7 @@ class PL_EventList_Table extends WP_List_Table
             'image' => '画像',
             'desc' => '表示',
             'reserve' => '公開時間',
+            'rate' => '支払い比率',
             'control' => '制御',
             'delete' => '削除'
         );
@@ -67,8 +68,12 @@ class PL_EventList_Table extends WP_List_Table
     // Display each column's content
     function column_default($item, $column_name)
     {
-        echo $item;
 		return isset($item[$column_name]) ? $item[$column_name] : '';
+    }
+
+    function column_rate($item)
+    {
+		return isset($item['rate']) ? $item['rate'] ."%": '';
     }
 
     function column_type($item)
@@ -101,7 +106,7 @@ class PL_EventList_Table extends WP_List_Table
         }
         $data .= '<br><a href="?page=planetsevententry&edit=' . $item['id'] . '">編集</a>';
         if($item['slug']){
-           $data .= '<br><a href="'.home_url() .'/report?term_id='.$item['category'].'&slug='.$item['slug'].'" target="_blank">レポートURL<span class="dashicons dashicons-admin-page"></span></a>';
+           $data .= '<br><a href="'.home_url() .'/report?term_id='.$item['category'].'&slug='.$item['slug'].'&code='.$item['code'].'" target="_blank">レポートURL<span class="dashicons dashicons-admin-page"></span></a>';
         }
         return $data;
     }    
@@ -121,6 +126,7 @@ class PL_GoodsList_Table extends WP_List_Table
             'image' => '画像',
             'desc' => '表示',
             'reserve' => '公開時間',
+            'rate' => '支払い比率',
             'control' => '制御',
             'delete' => '削除'
         );
@@ -145,7 +151,6 @@ class PL_GoodsList_Table extends WP_List_Table
     // Display each column's content
     function column_default($item, $column_name)
     {
-        echo $item;
 		return isset($item[$column_name]) ? $item[$column_name] : '';
     }
 
@@ -158,6 +163,10 @@ class PL_GoodsList_Table extends WP_List_Table
             $data .= '<br><div class="dashicons dashicons-hidden"></div>';
         }
         return $data;
+    }
+    function column_rate($item)
+    {
+		return isset($item['rate']) ? $item['rate'] ."%": '';
     }
     function column_Image($item){
         return '<img src="' . $item['image'] . '" width=100><br>' . $item['category'];
@@ -179,7 +188,7 @@ class PL_GoodsList_Table extends WP_List_Table
         }
         $data .= '<br><a href="?page=planetsevententry&edit=' . $item['id'] . '">編集</a>';
         if($item['slug']){
-           $data .= '<br><a href="'.home_url() .'/report?term_id='.$item['category'].'&slug='.$item['slug'].'" target="_blank">レポートURL<span class="dashicons dashicons-admin-page"></span></a>';
+           $data .= '<br><a href="'.home_url() .'/report?term_id='.$item['category'].'&slug='.$item['slug'].'&code='.$item['code'].'" target="_blank">レポートURL<span class="dashicons dashicons-admin-page"></span></a>'; 
         }
         return $data;
     }    
@@ -212,7 +221,7 @@ add_action('admin_menu', function(){
 //=================================================
 
 // データを追加
-function ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url, $image,$ord,$type,$open,$category,$slug) {
+function ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url, $image,$ord,$type,$open,$category,$slug,$rate,$code) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $result = $wpdb->insert(
@@ -230,7 +239,9 @@ function ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reser
             'type' => $type,
             'open' => $open,
             'category' => $category,
-            'slug' => $slug
+            'slug' => $slug,
+            'code' => $code,
+            'rate' => $rate
         )
     );
     if ($result === false) {
@@ -247,7 +258,7 @@ function ev_read_data($id) {
 }
 
 // データを更新
-function ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug) {
+function ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $result = $wpdb->update(
@@ -265,7 +276,8 @@ function ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$
             'type' => $type,
             'open' => $open,
             'category' => $category,
-            'slug' => $slug
+            'slug' => $slug,
+            'rate' => $rate,
         ),
         array('id' => $id)
     );
@@ -295,7 +307,9 @@ function planets_event_entry_page_contents() {
     // フォームからのデータを処理
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
-
+        echo '<hr>';
+        echo $action;
+        echo '<hr>';
         if ($action === 'create') {
             $title = sanitize_text_field($_POST['title']);
             $talent = sanitize_text_field($_POST['talent']);
@@ -312,7 +326,10 @@ function planets_event_entry_page_contents() {
             $ord = intval($_POST['ord']);
             $type = intval($_POST['type']);
             $open = intval($_POST['open']);
-            ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug);
+            $rate = intval($_POST['rate']);
+            $code = wp_generate_password(8, false);
+
+            ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate,$code);
         } elseif ($action === 'update') {
             $id = intval($_POST['id']);
             $title = sanitize_text_field($_POST['title']);
@@ -330,10 +347,15 @@ function planets_event_entry_page_contents() {
             $ord = intval($_POST['ord']);
             $type = intval($_POST['type']);
             $open = intval($_POST['open']);
-            ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug);
+            $rate = intval($_POST['rate']);
+            ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate);
         } elseif ($action === 'delete') {
             $id = intval($_POST['id']);
             ev_delete_data($id);
+        } elseif ($action === 'changecategory') {
+            $url =  get_category_link( $_POST['category']);
+            $image =  get_term_meta( $_POST['category'], 'category-image', true );
+            $slug =  get_category( $_POST['category'])->slug;
         }
     }
 
@@ -359,7 +381,6 @@ function planets_event_entry_page_contents() {
         $data = ev_read_data($id);
     }
 
-
 	?>
     <h2>TOP画面 表示</h2>
 
@@ -369,6 +390,35 @@ function planets_event_entry_page_contents() {
         <tr>
         <input type="hidden" name="id" size=2 value="<?php echo $data['id']; ?>" required>
         <tr><td>
+        <label for="url">カテゴリ</label></td><td>
+        <?php
+        $cat_list = wp_dropdown_categories(array(
+            'show_option_none' => 'カテゴリー選択',
+            'orderby' => 'term_id', //カテゴリーを何を基準に並べるか
+            'order' => 'DESC', //カテゴリーをどの方向に並べるか
+            'show_count' => 0, //カテゴリーに属する投稿数を表示するか
+            'hide_empty' => false, //投稿のないカテゴリーを表示するか
+            'child_of' => 2, //カテゴリーIDで指定されたカテゴリーの子孫カテゴリーを取得
+            'exclude' => '', //除外したいカテゴリーIDをコンマ区切りで指定
+            'echo' => 0, //カテゴリー一覧を表示する（1）、またはPHPで使うための値を返す（0）
+            'selected' => $_POST['category']?$_POST['category']:$data['category'], //初期状態で選択された状態にしておきたいカテゴリーのID（option要素にselectedが追加される）
+            'hierarchical' => 1, //カテゴリー一覧を階層形式（子孫カテゴリーをインデント）で表示するか
+            'name' => 'category', //select要素のname属性
+            'id' => 'category', //select要素のid属性
+            'class' => 'postform', //select要素のclass属性
+            'depth' => 1, //カテゴリーをどの階層まで出力するか
+            'tab_index' => 0, //select要素のtabindex属性の値
+            'taxonomy' => 'category', //取得するタクソノミー
+            'hide_if_empty' => 0, //タームが一つもない場合はドロップダウン自体を非表示
+            'value_field' => 'term_id' //option要素のvalue属性に入れるターム情報
+        ));
+        $replace = "<select$1 onchange='document.getElementById(\"action\").value = \"changecategory\";return this.form.submit()'>";
+        $cat_list  = preg_replace( '#<select([^>]*)>#', $replace, $cat_list );
+        echo $cat_list;
+        echo $_POST['category']?$_POST['category']:$data['category'];
+        ?>    
+        
+        </td></tr><tr><td>
         <label for="talent">タレント名</label></td><td>
         <input type="text" name="talent" size=50 id="title" value="<?php echo $data['talent']; ?>" required>
         </td></tr><tr><td>
@@ -392,35 +442,6 @@ function planets_event_entry_page_contents() {
         } ?>
         </select>
         </td></tr><tr><td>
-        <label for="url">カテゴリ</label></td><td>
-        <?php
-        $cat_list = wp_dropdown_categories(array(
-            'show_option_none' => 'カテゴリー選択',
-            'orderby' => 'term_id', //カテゴリーを何を基準に並べるか
-            'order' => 'DESC', //カテゴリーをどの方向に並べるか
-            'show_count' => 0, //カテゴリーに属する投稿数を表示するか
-            'hide_empty' => false, //投稿のないカテゴリーを表示するか
-            'child_of' => 2, //カテゴリーIDで指定されたカテゴリーの子孫カテゴリーを取得
-            'exclude' => '', //除外したいカテゴリーIDをコンマ区切りで指定
-            'echo' => 0, //カテゴリー一覧を表示する（1）、またはPHPで使うための値を返す（0）
-            'selected' => $_POST['category']?$_POST['category']:$data['category'], //初期状態で選択された状態にしておきたいカテゴリーのID（option要素にselectedが追加される）
-            'hierarchical' => 1, //カテゴリー一覧を階層形式（子孫カテゴリーをインデント）で表示するか
-            'name' => 'category', //select要素のname属性
-            'id' => 'category', //select要素のid属性
-            'class' => 'postform', //select要素のclass属性
-            'depth' => 1, //カテゴリーをどの階層まで出力するか
-            'tab_index' => 0, //select要素のtabindex属性の値
-            'taxonomy' => 'category', //取得するタクソノミー
-            'hide_if_empty' => 0, //タームが一つもない場合はドロップダウン自体を非表示
-            'value_field' => 'term_id' //option要素のvalue属性に入れるターム情報
-        ));
-        $replace = "<select$1 onchange='return this.form.submit()'>";
-        $cat_list  = preg_replace( '#<select([^>]*)>#', $replace, $cat_list );
-        echo $cat_list;
-        echo $_POST['category']?$_POST['category']:$data['category'];
-        ?>    
-        
-        </td></tr><tr><td>
         <label for="url">url</label></td><td>
         <input type="text" name="url" id="url" size=50 value="<?php echo get_category_link( $_POST['category']?$_POST['category']:$data['category']); ?>" readonly required>
         </td></tr><tr><td>
@@ -431,6 +452,9 @@ function planets_event_entry_page_contents() {
         <p><img src="<?php echo get_term_meta( $_POST['category']?$_POST['category']:$data['category'], 'category-image', true ); ?>" width="100"></p>
         <?php } ?>
         </div>
+        </td></tr><tr><td>
+        <label for="rate">支払い比率</label></td><td>
+        <input type="text" name="rate" id="rate" size=2 value="<?php echo $data['rate']; ?>" required>
         </td></tr><tr><td>
         <label for="ord">順序(降順)</label></td><td>
         <input type="text" name="ord" id="ord" size=2 value="<?php echo $data['ord']; ?>" required>
@@ -447,7 +471,7 @@ function planets_event_entry_page_contents() {
            <option value="0" <?php if ( ! empty( $data['open'] ) ) { if ( '0' === $data['open'] ) { echo 'selected'; } } ?>>非公開</option>
         </select>
         </td></tr><tr><td></td><td>
-        <input type="hidden" name="action" value="<?php echo $data['id'] ? 'update' : 'create'; ?>">
+        <input type="hidden" name="action" id="action" value="<?php echo $data['id'] ? 'update' : 'create'; ?>">
         <input type="submit" value="<?php echo $data['id'] ? '更新' : '登録'; ?>">
         </td></tr>
     </form></table>
