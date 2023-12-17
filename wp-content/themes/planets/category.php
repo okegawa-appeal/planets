@@ -81,35 +81,44 @@ if(!empty($category_image)){
 								$prizelist[$result['prize']] = $tmplist;
 							}
 						}
-						echo '<ul>';
+            			echo '<article class="lottory-items design-pattern__group">';
 						foreach($prizelist as $prize){
 							$sumrate = 0;
-							echo '<li>';
-							echo '<div class="award--badge">'.$prize[0]['prize'].'賞</div>';
-							echo '<div>'.$prize[0]['prize_name'].'</div>';
-							echo '<ul class="lottery-clearfix">';
 							foreach($prize as $p){
 								$sumrate += $p['rate'];
-								echo '<li class="lottery_image">';
-								echo '<img src="'.$p['prize_image'].'" width="100px">';
+							}
+							echo '<section class="award__'.$prize[0]['prize'].'">';
+							echo '<div class="award--header">';
+							echo '<p class="award--badge">'.$prize[0]['prize'].'賞</p>';
+							echo '<p class="award--lineup">LINE UP</p>';
+							if($raffle_use=='2'){
+							echo '<p class="award--probability">当選確率<em>'.$sumrate.'</em>%</p>';
+							}
+							echo '</div>';
+			                echo '<ul class="awards">';
+							foreach($prize as $p){
+								echo '<li>';
+								echo '<figure class="award--image">';
+								echo '<img src="'.$p['prize_image'].'"/>';
+								echo '</figure>';
+								echo '<p class="award--title">'.$p['prize_name'].'</p>';
+								echo '<p class="award--infomation">';
 								if($raffle_use=='1'){
 									if($p['count'] != 0){
-										echo '<div>残 '.$p['count'].'個</div>';
+										echo '残 '.$p['count'].'個';
 									}else{
-										echo '<div>売り切れ</div>';
+										echo '売り切れ';
 									}
 								}else{
-								echo '<div>'.$p['rate'].'%</div>';
+									echo ''.$p['rate'].'%';
 								}
+								echo '</p>';
 								echo '</li>';
 							}
 							echo '</ul>';
-							if($raffle_use=='2'){
-								echo '<div>'.$sumrate.'%</div>';
-							}
-							echo '</li>';
+							echo '</section>';
 						}
-						echo '</ul>';
+						echo '</article>';
 					}
 				}
 				?>

@@ -1,0 +1,294 @@
+@charset "UTF-8";
+.description-accordion {
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+}
+.description-accordion.description-accordion_open {
+  height: auto;
+}
+.description-accordion.description-accordion_open::after {
+  display: none;
+}
+.description-accordion::after {
+  width: 100%;
+  height: 100px;
+  content: " ";
+  display: block;
+  background: linear-gradient(180deg, rgba(244, 244, 244, 0) 0%, #f4f4f4 100%);
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+}
+
+.btn-more {
+  text-align: center;
+  width: 196px;
+  margin: 0 auto;
+  padding: 15px 0;
+  border-radius: 5px;
+  background-color: #282828;
+  color: #fff;
+}
+.btn-more .close {
+  display: none;
+}
+.btn-more.on-more .more {
+  display: none;
+}
+.btn-more.on-more .close {
+  display: inline;
+}
+
+.fadein {
+  opacity: 0;
+}
+
+.scrollin {
+  opacity: 1;
+  transition: 0.5s;
+}
+
+/* レイアウトcss */
+.awards {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  background-color: #fff;
+  max-width: 1200px;
+  width: 100%;
+  padding: 25px 0;
+}
+@media screen and (max-width: 599px) {
+  .awards {
+    justify-content: center;
+  }
+}
+.awards li {
+  width: 250px;
+  max-height: 460px;
+  margin: 10px 25px 30px 25px;
+}
+@media screen and (max-width: 599px) {
+  .awards li {
+    width: 300px;
+  }
+}
+
+.award--image {
+  background-color: #f4f4f4;
+}
+.award--image img {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+}
+@media screen and (max-width: 599px) {
+  .award--image img {
+    width: 300px;
+    height: 300px;
+  }
+}
+.award--badge {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: solid 2px #fff;
+  margin: -30px;
+  text-align: center;
+  line-height: 70px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+@media screen and (max-width: 599px) {
+  .award--badge {
+    margin: -35px -18px;
+  }
+}
+.award--probability {
+  position: absolute;
+  right: 0;
+  color: #ff0000;
+  font-size: 0.7rem;
+  margin: -25px 0 0 0;
+}
+.award--probability em {
+  color: #ff0000;
+  font-size: 140%;
+  font-weight: bold;
+}
+.award--title {
+  margin: 10px 0;
+}
+.award--infomation {
+  color: #ff0000;
+}
+
+.award__A .award--header {
+  background: linear-gradient(90deg, #eed6ea 14.7%, #ebe6e2 25.07%, #e8edda 35.43%, #caffdf 46.54%, #bff0ff 57.65%, #e3c5f9 72.08%, #f5c8c8 85.78%);
+}
+.award__A .award--badge {
+  background: linear-gradient(143deg, #eed6ea 14.7%, #ebe6e2 25.07%, #e8edda 35.43%, #caffdf 46.54%, #bff0ff 57.65%, #e3c5f9 72.08%, #f5c8c8 85.78%);
+}
+
+.award__B .award--header {
+  background: linear-gradient(90deg, #fcffdd 14.7%, #ffdf8d 85.78%);
+}
+.award__B .award--badge {
+  background: linear-gradient(143deg, #fcffdd 14.7%, #ffdf8d 85.78%);
+}
+
+.award__C .award--header {
+  background: linear-gradient(90deg, #f4f4f4 14.7%, #c7c7cb 85.78%);
+}
+.award__C .award--badge {
+  background: linear-gradient(143deg, #f4f4f4 14.7%, #c7c7cb 85.78%);
+}
+
+.award__D .award--header {
+  background: linear-gradient(90deg, #fdf5eb 14.7%, #d8bd9d 85.78%);
+}
+.award__D .award--badge {
+  background: linear-gradient(143deg, #fdf5eb 14.7%, #d8bd9d 85.78%);
+}
+
+.award__E .award--header {
+  background: linear-gradient(90deg, #fafafa 14.7%, #ffdfdf 85.78%);
+}
+.award__E .award--badge {
+  background: linear-gradient(143deg, #fafafa 14.7%, #ffdfdf 85.78%);
+}
+
+.award__F .award--header {
+  background: linear-gradient(90deg, #fff9fe 14.7%, #fde7ff 85.78%);
+}
+.award__F .award--badge {
+  background: linear-gradient(143deg, #fff9fe 14.7%, #fde7ff 85.78%);
+}
+
+.award__G .award--header {
+  background: linear-gradient(90deg, #f8faff 14.7%, #d3dff7 85.78%);
+}
+.award__G .award--badge {
+  background: linear-gradient(143deg, #f8faff 14.7%, #d3dff7 85.78%);
+}
+
+.award__H .award--header {
+  background: linear-gradient(90deg, #f3fff4 14.7%, #cff0d9 85.78%);
+}
+.award__H .award--badge {
+  background: linear-gradient(143deg, #f3fff4 14.7%, #cff0d9 85.78%);
+}
+
+.award__I .award--header {
+  background: linear-gradient(90deg, #fbffec 14.7%, #e7f2c9 85.78%);
+}
+.award__I .award--badge {
+  background: linear-gradient(143deg, #fbffec 14.7%, #e7f2c9 85.78%);
+}
+
+.award__J .award--header {
+  background: linear-gradient(90deg, #fafcea 14.7%, #dcdfbe 85.78%);
+}
+.award__J .award--badge {
+  background: linear-gradient(143deg, #fafcea 14.7%, #dcdfbe 85.78%);
+}
+
+.design-pattern__group section {
+  margin: 50px 0;
+  padding-top: 25px;
+}
+.design-pattern__group .award--header {
+  position: relative;
+  height: 10px;
+}
+.design-pattern__group .award--lineup {
+  position: absolute;
+  font-weight: bold;
+  margin: -23px 0 0 40px;
+}
+@media screen and (max-width: 599px) {
+  .design-pattern__group .award--lineup {
+    margin: -23px 0 0 55px;
+  }
+}
+
+.design-pattern__single {
+  margin: 70px 0;
+}
+.design-pattern__single section {
+  background: #fff;
+  margin: 0 calc(50% - 50vw);
+  width: 100vw;
+}
+.design-pattern__single ul {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.design-pattern__single .award--lineup {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+.design-pattern__single .award--header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  padding: 40px 0;
+}
+@media screen and (max-width: 599px) {
+  .design-pattern__single .award--header {
+    margin: 0 15px;
+  }
+}
+.design-pattern__single .award--header .award--lineup {
+  width: 200px;
+}
+.design-pattern__single .award--header::after {
+  border-top: 3px double black;
+  content: " ";
+  width: 100%;
+  height: 3px;
+  display: block;
+}
+.design-pattern__single .container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+@media screen and (max-width: 599px) {
+  .design-pattern__single .awards li {
+    margin: 0 24px 70px 24px;
+  }
+}
+
+.mobile {
+  display: none;
+}
+@media screen and (max-width: 599px) {
+  .mobile {
+    display: block;
+  }
+}
+
+.tablet {
+  display: none;
+}
+@media screen and (max-width: 983px) and (min-width: 600px) {
+  .tablet {
+    display: block;
+  }
+}
+
+.pc {
+  display: none;
+}
+@media screen and (min-width: 1201px) {
+  .pc {
+    display: block;
+  }
+}
+
+/*# sourceMappingURL=style.css.map */

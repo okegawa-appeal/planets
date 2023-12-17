@@ -56,7 +56,7 @@ $open = $_GET['open'];
                         ."order by wp_pl_raffle_order.order_date desc "
                         ."LIMIT $per_page OFFSET $offset " ;
                         $results = $wpdb->get_results($sql,ARRAY_A);
-                        echo '<div class="pagination">';
+                        echo '<br><div class="pagination">';
                         echo paginate_links(array(
                                 'total' => ($total_count / $per_page) + 1,
                                 'current' => $current_page,
@@ -130,10 +130,10 @@ $open = $_GET['open'];
                         ."order by RAND()" ;
 
                         $results = $wpdb->get_results($sql,ARRAY_A);
+                        echo '<div class="js-hide-contents">';
+                        echo '<div class="lottery-container">';
                         if(count($results)>0){
-                                echo '<a href="?open=1">演出をSKIPして全て開封する</a><br>';
-                                echo '<div class="js-hide-contents">';
-                                echo '<div class="lottery-container">';
+                                echo '<button class="fullopen" data-mem="'.$mem_id.'">演出をSKIPして全て開封する</button><br><br>';
                                 echo '<ul>';
                                 foreach ( (array) $results as $row ) {
                                         echo '<li><button class="start-award award-status-unopen" ';
@@ -151,11 +151,13 @@ $open = $_GET['open'];
                                         echo '<p class="lottery-title">'.$row['order_date'].' 購入</p>';
                                         echo '</button></li>';
                                 }
-                                ?>
+                                echo '</ul>';
+                        }
+                        echo '</div>';
+                        echo '</div>';
 
-                                </ul>
-                                </div>
-                                </div>
+                        if(count($results)>0){
+                        ?>
                                 <div id="Award-box">
                                         <div id="Sky"></div>
                                         <div id="SkyInner">

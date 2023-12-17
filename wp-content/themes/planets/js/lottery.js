@@ -71,6 +71,19 @@ $(function () {
         retina_detect: true,
     };
 
+    $(".fullopen").on("click", (event) => {
+        var mem = $(event.currentTarget).data("mem");
+        var hostUrl = 'https://' + location.host + '/wp-json/raffle/v1/allopen/';
+        $.ajax({
+            url: hostUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: { mem: mem },
+            timeout: 3000,
+        });
+        location.href = "?open=1";
+    });
+
     $(".start-award").on("click", (event) => {
         // 1
         $("#SkyInner").on("animationend webkitAnimationEnd", () => {
@@ -89,9 +102,7 @@ $(function () {
         $(".snav").hide();
         var id = $(event.currentTarget).data("index");
         var order_id = $(event.currentTarget).data("order");
-        console.log(order_id);
         var hostUrl = 'https://' + location.host + '/wp-json/raffle/v1/open/'
-        console.log(hostUrl);
         $.ajax({
             url: hostUrl,
             type: 'POST',

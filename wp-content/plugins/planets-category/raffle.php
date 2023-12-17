@@ -201,6 +201,10 @@ function raffle_api_endpoint() {
         'methods' => 'POST',
         'callback' => 'raffle_api_callback',
     ));
+    register_rest_route('raffle/v1', '/allopen/', array(
+        'methods' => 'POST',
+        'callback' => 'raffle_api_callback_allopen',
+    ));
 }
 add_action('rest_api_init', 'raffle_api_endpoint');
 
@@ -231,8 +235,30 @@ function raffle_api_callback(WP_REST_Request $request) {
         return new WP_Error('invalid_params', 'target not found.', array('status' => 400));
     }
 }
+// REST APIのコールバック関数
+function raffle_api_callback_allopen(WP_REST_Request $request) {
+    $mem_id = $request->get_param('mem');
+    if (empty($mem_id) ) {
+        return new WP_Error('invalid_params', 'mem is required.', array('status' => 400));
+    }
+    global $wpdb;
+
+    $sql = "update wp_pl_raffle_order  inner join wp_usces_order "
+        ."on wp_pl_raffle_order.order_id = wp_usces_order.ID "
+        ."set open = true   "
+        ."where mem_id = $mem_id "
+        ."and open =false; ";
+
+    // 更新を実行
+    $updated_rows = $wpdb->query($wpdb->prepare($sql));
+    if ($updated_rows !== false) {
+        $response = array('message' => 'update successfully', 'MEM' => $mem_id);
+        return new WP_REST_Response($response, 200);
+    } else {
+        return new WP_Error('invalid_params', 'target not found.', array('status' => 400));
+    }
+}
 function raffle_api_call($id,$order_id){
-    echo "raffle_api_call";
 	$getuserurl = home_url().'/wp-json/raffle/v1/open/';
 	$args = array(
 		'method' => 'POST',
@@ -246,13 +272,34 @@ function raffle_api_call($id,$order_id){
 		)
 	);
 	$response 	= wp_remote_post( $getuserurl, $args );
-    print_r($response);
 	if (is_wp_error($response)) {
 		$result =  'HTTPリクエストエラー: ' . $response->get_error_message();
 	} else {
 		// ステータスコード
 		$result =  'ステータスコード: ' . wp_remote_retrieve_response_code($response) . "\n";
 
+		// レスポンスボディ
+		$result = $result .  'レスポンスボディ: ' . wp_remote_retrieve_body($response) . "\n";
+	}
+}
+function raffle_api_call_allopen($mem_id){
+	$getuserurl = home_url().'/wp-json/raffle/v1/allopen/';
+	$args = array(
+		'method' => 'POST',
+		'httpversion' => '1.1',
+		'headers'  => array(
+				'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8',
+		),
+		'body' => array(
+			'mem' => $mem_id,
+		)
+	);
+	$response 	= wp_remote_post( $getuserurl, $args );
+	if (is_wp_error($response)) {
+		$result =  'HTTPリクエストエラー: ' . $response->get_error_message();
+	} else {
+		// ステータスコード
+		$result =  'ステータスコード: ' . wp_remote_retrieve_response_code($response) . "\n";
 		// レスポンスボディ
 		$result = $result .  'レスポンスボディ: ' . wp_remote_retrieve_body($response) . "\n";
 	}
@@ -356,12 +403,7 @@ function test_purchase($post_id,$order_id,$itemcount) {
 function purchase_nolimit($post_id,$order_id,$itemcount) {
     global $wpdb;
     for($i = 0;$i < $itemcount ; $i++) {
-/*        $sql ="insert into wp_pl_raffle_order(post_id,raffle_id,order_id) "
-            ."select $post_id,ID,$order_id FROM  "
-            ."(select FLOOR(RAND()*(select max(rate) FROM wp_pl_raffle where post_id = $post_id)*1000) as baserate) b,wp_pl_raffle "
-            ."where rate*1000 >= baserate "
-            ."order by rand()  limit 1;";*/
-        $sql = "insert into wp_pl_raffle_order(post_id,raffle_id,order_id) "
+       $sql = "insert into wp_pl_raffle_order(post_id,raffle_id,order_id) "
             ."select $post_id,ID,$order_id FROM  "
             ."(select A1.ID,A1.rate,sum(A2.rate)  sum   "
             ."FROM (select * FROM wp_pl_raffle where post_id = $post_id) A1   "
@@ -372,7 +414,6 @@ function purchase_nolimit($post_id,$order_id,$itemcount) {
             ."(select rand()*100 rand) as b1  "
             ."where b0.sum >= b1.rand  "
             ."limit 1";
-        echo $sql;
         $wpdb->query($sql);
         
         if ($result === false) {
@@ -503,6 +544,9 @@ function planets_raffle_contents() {
                 $id = intval($_POST['id']);
                 $order_id = intval($_POST['order_id']);
                 raffle_api_call($id,$order_id);
+            } elseif ($action === 'raffle_allopen') {
+                $mem_id = intval($_POST['mem_id']);
+                raffle_api_call_allopen($mem_id);
             }
         }
 
@@ -648,6 +692,19 @@ function planets_raffle_contents() {
             </td></tr><tr><td></td><td>
             <input type="hidden" name="action" value="raffle_open">
             <input type="submit" value="くじ引き開封">
+            </td></tr>
+        </form></table>
+        <hr>
+        お試し全オープン
+        <table>
+        <form method="post">
+            <tr>
+            <td>
+            <label for="mem_id">MEM_ID</label></td><td>
+            <input type="text" name="mem_id" size=50 id="mem_id" required>
+            </td></tr><tr><td>
+            <input type="hidden" name="action" value="raffle_allopen">
+            <input type="submit" value="くじ引き全開封">
             </td></tr>
         </form></table>
         <?php

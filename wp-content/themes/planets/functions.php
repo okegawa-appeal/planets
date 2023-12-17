@@ -15,6 +15,9 @@ function theme_enqueue_styles() {
     wp_enqueue_script( 'particles.min.js', 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js');
     wp_enqueue_script( 'lottery.js', get_stylesheet_directory_uri() . '/js/lottery.js' );
   }
+  if(is_category()){
+    wp_enqueue_style( 'lottery_category', get_stylesheet_directory_uri() . '/css/lottery_category.css', array( 'style' ) );
+  }
 }
 
 #### 会員登録必須にするため次へボタンを消す ####
