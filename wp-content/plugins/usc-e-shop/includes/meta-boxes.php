@@ -292,7 +292,7 @@ function usces_post_categories_meta_box( $post, $box ) {
 		$args = $box['args'];
 	extract( wp_parse_args($args, $defaults), EXTR_SKIP );
 	$tax = get_taxonomy($taxonomy);
-	
+
 	if( 'category' == $args['taxonomy'] ){
 	?>
 	<div id="taxonomy-<?php echo esc_attr( $taxonomy ); ?>" class="categorydiv">
@@ -323,7 +323,6 @@ function usces_post_categories_meta_box( $post, $box ) {
 	<?php
 	
 	}else{
-	
 	?>
 	<div id="taxonomy-<?php echo esc_attr( $taxonomy ); ?>" class="categorydiv">
 		<ul id="<?php echo esc_attr( $taxonomy ); ?>-tabs" class="category-tabs">

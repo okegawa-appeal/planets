@@ -32,7 +32,7 @@ function add_custom_menu() {
     'カテゴリ', // ①ページタイトル
     'カテゴリ', // ②ラベル
     'manage_options', // ③表示するユーザーの権限
-    'edit-tags.php?taxonomy=category&orderby=id&order=desc', // ④スラッグ名
+    'edit-tags.php?taxonomy=category', // ④スラッグ名
     '', // ⑤遷移後に実行する関数
     'dashicons-category', // ⑥アイコン
     '13' // ⑦表示位置
@@ -66,8 +66,7 @@ function download_contents(){
   global $wpdb;
   $table_name = $wpdb->prefix . 'pl_dl_contents';
   //TODO: 未公開をフィルタさせる
-
-  $query = "SELECT * FROM $table_name where ( mem_id = '".usces_memberinfo('ID','return')."' or email ='".usces_memberinfo( 'mailaddress1' ,'return')."' ) and open = true and work = false order by id desc";
+  $query = "SELECT * FROM $table_name where email ='".usces_memberinfo( 'mailaddress1' ,'return')."' order by id desc";
   $results = $wpdb->get_results($query, ARRAY_A);
 
   echo '<h3>ダウンロードコンテンツ</h3>';
@@ -678,19 +677,6 @@ function save_bookend($post_id) {
     update_post_meta( $post_id, 'publish_date', $_POST['publish_date'] );
 }
 add_action('save_post', 'save_bookend');
-
-#### 商品画面のカテゴリ並び順を変更 ####
-
-function taxonomy_checklist_checked_ontop_filter ($args)
-{
-  print_r($args);
-  $args['checked_ontop'] = false;
-  $args['list_only'] = true;
-  return $args;
-
-}
-
-add_filter('wp_terms_checklist_args','taxonomy_checklist_checked_ontop_filter');
 
 
 ?>

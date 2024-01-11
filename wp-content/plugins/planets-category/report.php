@@ -37,7 +37,6 @@ class PL_Report_Table extends WP_List_Table
 
         $sql = "select wp_term_taxonomy.term_id,name FROM wp_term_taxonomy,wp_terms where parent = 2 and wp_term_taxonomy.term_taxonomy_id = wp_terms.term_id";
 
-
         $total_items = $wpdb->get_var($sql);
 		$this->set_pagination_args(array(
             'total_items' => $total_items,

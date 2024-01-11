@@ -39,7 +39,7 @@ $open = $_GET['open'];
                         ."and wp_pl_raffle.post_id = wp_usces_item.post_id "
                         ."and wp_pl_raffle.ID = wp_pl_raffle_order.raffle_id "
                         ."and wp_pl_raffle_order.open = true "
-                        ."and order_status like '%receipted%' "
+                        ."and order_status not like '%noreceipt%' "
                         ."and order_status not like '%cancel%' "
                         ."order by wp_pl_raffle_order.order_date desc ";
                         $total_count = $wpdb->get_var($sqlcount);
@@ -51,7 +51,7 @@ $open = $_GET['open'];
                         ."and wp_pl_raffle.post_id = wp_usces_item.post_id "
                         ."and wp_pl_raffle.ID = wp_pl_raffle_order.raffle_id "
                         ."and wp_pl_raffle_order.open = true "
-                        ."and order_status like '%receipted%' "
+                        ."and order_status not like '%noreceipt%' "
                         ."and order_status not like '%cancel%' "
                         ."order by wp_pl_raffle_order.order_date desc "
                         ."LIMIT $per_page OFFSET $offset " ;
@@ -97,7 +97,7 @@ $open = $_GET['open'];
                         ."and wp_pl_raffle.post_id = wp_usces_item.post_id "
                         ."and wp_pl_raffle.ID = wp_pl_raffle_order.raffle_id "
                         ."and wp_pl_raffle_order.open = false "
-                        ."and order_status like '%noreceipt%' "
+                        ."and order_status not like '%noreceipt%' "
                         ."and order_status not like '%cancel%' "
                         ."order by wp_pl_raffle_order.ID ASC ";
 
@@ -125,7 +125,7 @@ $open = $_GET['open'];
                         ."and wp_pl_raffle.post_id = wp_usces_item.post_id "
                         ."and wp_pl_raffle.ID = wp_pl_raffle_order.raffle_id "
                         ."and wp_pl_raffle_order.open = false "
-                        ."and order_status like '%receipted%' "
+                        ."and order_status not like '%noreceipt%' "
                         ."and order_status not like '%cancel%' "
                         ."order by RAND()" ;
 
@@ -147,7 +147,7 @@ $open = $_GET['open'];
                                         echo '<div class="lottery-image">';
                                         echo '<img src="'.get_stylesheet_directory_uri().'/images/lotteryimage.png" />';
                                         echo '</div>';
-                                        echo '<p class="lottery-title">'.$row['itemName'].$row['prize'].' </p>';
+                                        echo '<p class="lottery-title">'.$row['itemName'].' </p>';
                                         echo '<p class="lottery-title">'.$row['order_date'].' 購入</p>';
                                         echo '</button></li>';
                                 }
