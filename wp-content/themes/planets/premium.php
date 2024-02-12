@@ -1,14 +1,13 @@
 <?php
 /**
- * Header Template
+ * Template Name: premium
  *
  * @package Welcart
  * @subpackage Welcart_Basic
  */
-
-get_header();
+get_header('premium');
 global $wpdb;
-$query = "select * FROM wp_pl_event where type = '1' and open = '1' and genre = 0  order by ord desc";
+$query = "select * FROM wp_pl_event where type = '1' and open = '1' and genre = 1 order by ord desc";
 $events = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 $current_datetime = new DateTime("now", new DateTimeZone("JST"));  // 例: Current_datetimeから取得したUTC日付
 
@@ -45,7 +44,7 @@ foreach ($events as $row){
 			<ul class="category-container">
 <?php 
 global $wpdb;
-$query = "select * FROM wp_pl_event where type = '2' and open = '1' and genre = 0  order by ord desc";
+$query = "select * FROM wp_pl_event where type = '2' and open = '1' and genre = 1 order by ord desc";
 $goods = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 foreach ($goods as $row){  
 	//var_dump($row);
@@ -88,10 +87,10 @@ if( ! empty( $postslist ) ){
 				</ul>
 			</div>
 			<div class="announce_news">
-				<ul>
-					<li><a href="https://twitter.com/WPlanets23543" target="_blank"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/xlink.png"></a></li>
+				<!--ul>
+					<li><a href="https://twitter.com/WPlanets23543" target="_blank"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/xlink.png"></a></li -->
 				<!-- a class="twitter-timeline" data-lang="ja" data-height="400" href="https://twitter.com/MUVUS_oshirase?ref_src=twsrc%5Etfw">Tweets by MUVUS_oshirase</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script -->
-				</ul>
+				<!-- /ul -->
 			</div>
 		</div>
 		<div>

@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: Planets Event
-Description: Planets用のイベント表示アプリ
+Plugin Name: Planets Premium
+Description: Planets Premiumのイベント表示アプリ
 Version: 1.0
 */
 
@@ -12,7 +12,7 @@ if (!class_exists('WP_List_Table')) {
 }
 
 // Define custom WP_List_Table class for displaying custom table data
-class PL_EventList_Table extends WP_List_Table
+class PL_PREMIUM_EventList_Table extends WP_List_Table
 {
     // Define columns for the table
     function get_columns()
@@ -40,7 +40,7 @@ class PL_EventList_Table extends WP_List_Table
         $sortable = array();
         $this->_column_headers = array($columns, $hidden, $sortable);
 
-        $data = $wpdb->get_results("SELECT * FROM $table_name WHERE type = 1 AND genre = 0 ORDER BY type,ord desc ", ARRAY_A);
+        $data = $wpdb->get_results("SELECT * FROM $table_name WHERE type = 1 AND genre = 1 ORDER BY type,ord desc ", ARRAY_A);
         $this->items = $data;
     }
 
@@ -83,7 +83,7 @@ class PL_EventList_Table extends WP_List_Table
         if($item['url']){
             $data =  '<a href="' . $item['url'] . '" target="_blank">イベントURL<span class="dashicons dashicons-admin-page"></span></a>';
         }
-        $data .= '<br><a href="?page=planetsevententry&edit=' . $item['id'] . '">編集</a>';
+        $data .= '<br><a href="?page=planetspremiumentry&edit=' . $item['id'] . '">編集</a>';
         if($item['slug']){
            $data .= '<br><a href="'.home_url() .'/report?term_id='.$item['category'].'&slug='.$item['slug'].'&code='.$item['code'].'" target="_blank">レポートURL<span class="dashicons dashicons-admin-page"></span></a>';
         }
@@ -95,7 +95,7 @@ class PL_EventList_Table extends WP_List_Table
 }
 
 // Define custom WP_List_Table class for displaying custom table data
-class PL_GoodsList_Table extends WP_List_Table
+class PL_PREMIUM_GoodsList_Table extends WP_List_Table
 {
     // Define columns for the table
     function get_columns()
@@ -123,7 +123,7 @@ class PL_GoodsList_Table extends WP_List_Table
         $sortable = array();
         $this->_column_headers = array($columns, $hidden, $sortable);
 
-        $data = $wpdb->get_results("SELECT * FROM $table_name WHERE type = 2 AND genre = 0 ORDER BY type,ord desc ", ARRAY_A);
+        $data = $wpdb->get_results("SELECT * FROM $table_name WHERE type = 2 AND genre = 1 ORDER BY type,ord desc ", ARRAY_A);
         $this->items = $data;
     }
 
@@ -165,7 +165,7 @@ class PL_GoodsList_Table extends WP_List_Table
         if($item['url']){
             $data =  '<a href="' . $item['url'] . '" target="_blank">イベントURL<span class="dashicons dashicons-admin-page"></span></a>';
         }
-        $data .= '<br><a href="?page=planetsevententry&edit=' . $item['id'] . '">編集</a>';
+        $data .= '<br><a href="?page=planetspremiumentry&edit=' . $item['id'] . '">編集</a>';
         if($item['slug']){
            $data .= '<br><a href="'.home_url() .'/report?term_id='.$item['category'].'&slug='.$item['slug'].'&code='.$item['code'].'" target="_blank">レポートURL<span class="dashicons dashicons-admin-page"></span></a>'; 
         }
@@ -185,13 +185,13 @@ add_action('admin_menu', function(){
 	// メインメニュー①
 	//---------------------------------	
     add_menu_page(
-		'TOP画面' // ページのタイトルタグ<title>に表示されるテキスト
-		, 'TOP画面'   // 左メニューとして表示されるテキスト
+		'PREMIUM TOP' // ページのタイトルタグ<title>に表示されるテキスト
+		, 'PREMIUM TOP'   // 左メニューとして表示されるテキスト
 		, 'manage_options'       // 必要な権限 manage_options は通常 administrator のみに与えられた権限
-		, 'planetsevententry'        // 左メニューのスラッグ名 →URLのパラメータに使われる /wp-admin/admin.php?page=toriaezu_menu
-		, 'planets_event_entry_page_contents' // メニューページを表示する際に実行される関数(サブメニュー①の処理をする時はこの値は空にする)
+		, 'planetspremiumentry'        // 左メニューのスラッグ名 →URLのパラメータに使われる /wp-admin/admin.php?page=toriaezu_menu
+		, 'planets_premium_entry_page_contents' // メニューページを表示する際に実行される関数(サブメニュー①の処理をする時はこの値は空にする)
 		, 'dashicons-category'       // メニューのアイコンを指定 https://developer.wordpress.org/resource/dashicons/#awards
-		, 3.01                             // メニューが表示される位置のインデックス(0が先頭) 5=投稿,10=メディア,20=固定ページ,25=コメント,60=テーマ,65=プラグイン,70=ユーザー,75=ツール,80=設定
+		, 3.02                            // メニューが表示される位置のインデックス(0が先頭) 5=投稿,10=メディア,20=固定ページ,25=コメント,60=テーマ,65=プラグイン,70=ユーザー,75=ツール,80=設定
 	);
 });
 
@@ -200,7 +200,7 @@ add_action('admin_menu', function(){
 //=================================================
 
 // データを追加
-function ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url, $image,$ord,$type,$open,$category,$slug,$rate,$code) {
+function pr_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url, $image,$ord,$type,$open,$category,$slug,$rate,$code) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $result = $wpdb->insert(
@@ -221,7 +221,7 @@ function ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reser
             'slug' => $slug,
             'code' => $code,
             'rate' => $rate,
-            'genre' => 0
+            'genre' => 1
         )
     );
     if ($result === false) {
@@ -230,7 +230,7 @@ function ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reser
 }
 
 // データを読み取り
-function ev_read_data($id) {
+function pr_read_data($id) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $result = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $id", ARRAY_A);
@@ -238,7 +238,7 @@ function ev_read_data($id) {
 }
 
 // データを更新
-function ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate) {
+function pr_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $result = $wpdb->update(
@@ -258,7 +258,7 @@ function ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$
             'category' => $category,
             'slug' => $slug,
             'rate' => $rate,
-            'genre' => 0
+            'genre' => 1
         ),
         array('id' => $id)
     );
@@ -268,7 +268,7 @@ function ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$
 }
 
 // データを削除
-function ev_delete_data($id) {
+function pr_delete_data($id) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_event';
     $wpdb->delete(
@@ -283,7 +283,7 @@ function ev_delete_data($id) {
 //=================================================
 // サブメニューイベント表示
 //=================================================
-function planets_event_entry_page_contents() {
+function planets_premium_entry_page_contents() {
 	ob_start();
     // フォームからのデータを処理
     if (isset($_POST['action'])) {
@@ -356,11 +356,11 @@ function planets_event_entry_page_contents() {
 
     if (isset($_GET['edit'])) {
         $id = intval($_GET['edit']);
-        $data = ev_read_data($id);
+        $data = pr_read_data($id);
     }
 
 	?>
-    <h2>通常 TOP</h2>
+    <h2>PREMIUM TOP</h2>
 
     <!-- データ入力フォーム -->
     <table>
@@ -456,11 +456,11 @@ function planets_event_entry_page_contents() {
     <hr>
     EVENT
     <?php
-        $event_table = new PL_EventList_Table();
+        $event_table = new PL_PREMIUM_EventList_Table();
         $event_table->prepare_items();
         $event_table->display();
         echo 'GOODS';
-        $goods_table = new PL_GoodsList_Table();
+        $goods_table = new PL_PREMIUM_GoodsList_Table();
         $goods_table->prepare_items();
         $goods_table->display();
 

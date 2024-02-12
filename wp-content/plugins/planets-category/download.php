@@ -21,47 +21,43 @@ class PL_DL_Contents_List_Table extends WP_List_Table
             'id' => 'ID',
             'status' => 'status',
             'purchase_date' => 'DL期限',
+            'event_name' => 'イベント名',
             'item_name' => '商品名',
             'path' => 'パス',
             'email' => 'メール',
             'mem_name1' => '名前'
         );
     }
-/*    public function extra_tablenav($which) {
+    public function extra_tablenav($which) {
+        global $wpdb;
+        $data = $wpdb->get_results("select event_name from wp_pl_dl_contents group by event_name order by id desc", ARRAY_A);
+
         if ($which === 'top') {
             echo '<div class="alignleft actions">';
             echo '<label for="filter-by-status" class="screen-reader-text">ステータスでフィルタ:</label>';
             echo '<select name="filter_by_status" id="filter-by-status">';
-            echo '<option value="">ステータスでフィルタ</option>';
-            echo '<option value="open" '.($_POST['filter_by_status'] == "open"?"SELECTED":"").'>公開済み</option>';
-            echo '<option value="hidden" '.($_POST['filter_by_status'] == "hidden"?"SELECTED":"").'>未公開</option>';
-            echo '<option value="mailed" '.($_POST['filter_by_status'] == "mailed"?"SELECTED":"").'>メール送信済み</option>';
-            echo '<option value="unmailed" '.($_POST['filter_by_status'] == "unmailed"?"SELECTED":"").'>メール未送信</option>';
+            echo '<option value="">最終アップロードデータ</option>';
+            foreach ($data as $row) {
+                echo '<option value="'.$row['event_name'].'" '.($_POST['filter_by_status'] == $row['event_name']?"SELECTED":"").'>'.$row['event_name'].'</option>';
+            }
             echo '</select>';
             submit_button('フィルタ', 'button', false, false, array('id' => 'status-filter-submit'));
             echo '</div>';
         }
     }
-*/
+
     // Prepare data for the table
     function prepare_items()
     {
         global $wpdb;
-/*        if (isset($_POST['filter_by_status']) && $_POST['filter_by_status'] !== '') {
+        if (isset($_POST['filter_by_status']) && $_POST['filter_by_status'] !== '') {
             // カテゴリでフィルタリングする処理を実装する
             $status_value = $_POST['filter_by_status'];
-            if($status_value == 'open'){
-                $filter_option = "AND open = true";
-            }elseif($status_value == 'hidden'){
-                $filter_option = "AND open = false";
-            }elseif($status_value == 'mailed'){
-                $filter_option = "AND mailed = true";
-            }elseif($status_value == 'unmailed'){
-                $filter_option = "AND mailed = false";
-            }
+            $filter_option = "WHERE event_name = '" .$status_value."'";
+        }else{
+            $filter_option = "WHERE work = true";
         }
-*/
-        $filter_option = "AND work = true";
+
         $table_name = $wpdb->prefix . 'pl_dl_contents';
         $per_page = 100;
         $current_page = $this->get_pagenum();
@@ -69,7 +65,7 @@ class PL_DL_Contents_List_Table extends WP_List_Table
 
         $search = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
 
-        $total_items = $wpdb->get_var("SELECT COUNT(*) FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.email = wp_usces_member.mem_email) WHERE item_name LIKE '%$search%' $filter_option");
+        $total_items = $wpdb->get_var("SELECT COUNT(*) FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.email = wp_usces_member.mem_email) $filter_option");
 
         $this->set_pagination_args(array(
             'total_items' => $total_items,
@@ -85,7 +81,7 @@ class PL_DL_Contents_List_Table extends WP_List_Table
         $orderby = (!empty($_GET['orderby'])) ? sanitize_text_field($_GET['orderby']) : 'id';
         $order = (!empty($_GET['order']) && in_array(strtoupper($_GET['order']), array('ASC', 'DESC'))) ? strtoupper($_GET['order']) : 'ASC';
 
-        $data = $wpdb->get_results("SELECT wp_pl_dl_contents.*,mem_name1 FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.mem_id = wp_usces_member.ID) WHERE item_name LIKE '%$search%' $filter_option ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A);
+        $data = $wpdb->get_results("SELECT wp_pl_dl_contents.*,mem_name1 FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.mem_id = wp_usces_member.ID) $filter_option ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A);
         $this->items = $data;
     }
 
@@ -118,6 +114,7 @@ class PL_DL_Contents_List_Table extends WP_List_Table
         return array(
             'id' => array('id', false),
             'purchase_date' => array('purchase_date', false),
+            'event_name' => array('event_name', false),
             'item_name' => array('item_name', false),
             'path' => array('path', false),
             'email' => array('email', false),
@@ -136,7 +133,7 @@ class PL_DL_Contents_List_Table extends WP_List_Table
         echo '<input type="file" name="csv_file" id="csv_file" accept=".csv">';
         echo '<input type="submit" name="import_csv" value="インポート">';
         echo '</form>';
-        echo '<a href="' . plugins_url( 'files/planets-download-importfile.csv', __FILE__ ) . '">サンプルファイル</a>';
+        echo '<a href="' . plugins_url( 'files/planets-download-importfile_20240210.csv', __FILE__ ) . '">サンプルファイル(ver20240210)</a>';
     }
 }
 
@@ -149,20 +146,45 @@ function handle_csv_import()
     if ($_FILES['csv_file']['error'] == 0) {
         $file = $_FILES['csv_file']['tmp_name'];
         $handle = fopen($file, "r");
+        $count = 1;
         while (($data = fgetcsv($handle, 1000, ",")) !== false) {
             $purchase_date = sanitize_text_field($data[0]);
-            $item_name = mb_convert_encoding($data[1], 'UTF-8', 'SJIS');
-            $path = sanitize_text_field($data[2]);
-            $email = sanitize_text_field($data[3]);
+            $event_name = mb_convert_encoding($data[1], 'UTF-8', 'SJIS');
+            $item_name = mb_convert_encoding($data[2], 'UTF-8', 'SJIS');
+            $path = sanitize_text_field($data[3]);
+            $email = sanitize_text_field($data[4]);
             // mem_idを取得
             $sql = "select mem_id from wp_usces_order where order_email = '$email'";
             $mem_id = $wpdb->get_var($sql);
             //TODO: ２つとれた
             //TODO: なかった
-
+            $error_flg = false;
+            if($purchase_date == NULL){
+                echo '<div class="error"><p>'.$count.'行目 日付が入っていません。登録スキップします。</p></div>';
+                $error_flg = true;
+            }
+            if($event_name == NULL){
+                echo '<div class="error"><p>'.$count.'行目 イベント名が入っていません。登録スキップします。</p></div>';
+                $error_flg = true;
+            }
+            if($item_name == NULL){
+                echo '<div class="error"><p>'.$count.'行目 商品名が入っていません。登録スキップします。</p></div>';
+                $error_flg = true;
+            }
+            if($path == NULL){
+                echo '<div class="error"><p>'.$count.'行目 パスが入っていません。登録スキップします。</p></div>';
+                $error_flg = true;
+            }
+            if($email == NULL){
+                echo '<div class="error"><p>'.$count.'行目 メールが入っていません。登録スキップします。</p></div>';
+                $error_flg = true;
+            }
             // Check if record already exists based on email
-            $table_name = $wpdb->prefix . 'pl_dl_contents';
-            $wpdb->insert($table_name, array('purchase_date' => $purchase_date, 'item_name' => $item_name, 'path' => $path, 'email' => $email,'mem_id'=>$mem_id,'work'=>true));
+            if($error_flg == false){
+                $table_name = $wpdb->prefix . 'pl_dl_contents';
+                $wpdb->insert($table_name, array('purchase_date' => $purchase_date, 'item_name' => $item_name, 'path' => $path, 'email' => $email,'mem_id'=>$mem_id,'event_name'=>$event_name,'work'=>true));
+            }
+            $count++;
         }
 
         fclose($handle);
@@ -197,7 +219,50 @@ function dl_page_content()
             handle_csv_import();
         }
     }
-
+    // Handle bulk delete action
+    if (isset($_POST['bulk_open'])) {
+        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
+        if (!empty($ids)) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'pl_dl_contents';
+            $ids_str = implode(',', $ids);
+            $wpdb->query("UPDATE $table_name SET open = true WHERE id IN ($ids_str)");
+        }
+//        echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
+    }
+/*    if (isset($_POST['bulk_hidden'])) {
+        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
+        if (!empty($ids)) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'pl_dl_contents';
+            $ids_str = implode(',', $ids);
+            $wpdb->query("UPDATE $table_name SET open = false WHERE id IN ($ids_str)");
+        }
+        echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
+    }*/
+    if (isset($_POST['bulk_delete'])) {
+        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
+        if (!empty($ids)) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'pl_dl_contents';
+            $ids_str = implode(',', $ids);
+            $wpdb->query("DELETE FROM $table_name WHERE id IN ($ids_str)");
+        }
+//        echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
+    }
+    if (isset($_POST['senddlmail'])) {
+        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
+        if (!empty($ids)) {
+            send_dl_mail($ids,$_POST['messagebody']);
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'pl_dl_contents';
+            $ids_str = implode(',', $ids);
+            $wpdb->query("UPDATE $table_name SET mailed = true WHERE id IN ($ids_str)");
+//            echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
+        }else{
+            echo 'メールの送信先を指定してください';
+        }
+    }
     // Display the form and data
     echo '<div class="wrap">';
     echo '<h1>DLコンテンツ</h1>';
@@ -237,52 +302,9 @@ function dl_page_content()
         <input type="submit" name="senddlmail" class="button" value="メール送信">
     </form>
     <?php
-    // Handle bulk delete action
-    if (isset($_POST['bulk_open'])) {
-        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
-        if (!empty($ids)) {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'pl_dl_contents';
-            $ids_str = implode(',', $ids);
-            $wpdb->query("UPDATE $table_name SET open = true WHERE id IN ($ids_str)");
-        }
-        echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
-    }
-/*    if (isset($_POST['bulk_hidden'])) {
-        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
-        if (!empty($ids)) {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'pl_dl_contents';
-            $ids_str = implode(',', $ids);
-            $wpdb->query("UPDATE $table_name SET open = false WHERE id IN ($ids_str)");
-        }
-        echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
-    }*/
-    if (isset($_POST['bulk_delete'])) {
-        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
-        if (!empty($ids)) {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'pl_dl_contents';
-            $ids_str = implode(',', $ids);
-            $wpdb->query("DELETE FROM $table_name WHERE id IN ($ids_str)");
-        }
-        echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
-    }
+
 
     echo '</div>';
-    if (isset($_POST['senddlmail'])) {
-        $ids = isset($_POST['id']) ? array_map('absint', $_POST['id']) : array();
-        if (!empty($ids)) {
-            send_dl_mail($ids,$_POST['messagebody']);
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'pl_dl_contents';
-            $ids_str = implode(',', $ids);
-            $wpdb->query("UPDATE $table_name SET mailed = true WHERE id IN ($ids_str)");
-            echo "<script>window.location = '".$_SERVER['REQUEST_URI']."';</script>";
-        }else{
-            echo 'メールの送信先を指定してください';
-        }
-    }
 
 }
 /*function add_custom_search_filter($query)
