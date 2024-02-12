@@ -84,9 +84,9 @@
 	<?php 
 	if(wp_is_mobile()){
 //			xo_slider( 392 );
-		xo_slider( 458 ); 
+		xo_slider( 742 ); 
 	}else{
-		xo_slider( 458 ); 
+		xo_slider( 742 ); 
 	}
 
 	$class = 'one-column';
