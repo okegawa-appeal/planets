@@ -59,18 +59,9 @@ class PL_DL_Contents_List_Table extends WP_List_Table
         }
 
         $table_name = $wpdb->prefix . 'pl_dl_contents';
-        $per_page = 100;
+        $per_page = 500;
         $current_page = $this->get_pagenum();
         $offset = ($current_page - 1) * $per_page;
-
-        $search = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
-
-        $total_items = $wpdb->get_var("SELECT COUNT(*) FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.email = wp_usces_member.mem_email) $filter_option");
-
-        $this->set_pagination_args(array(
-            'total_items' => $total_items,
-            'per_page'    => $per_page,
-        ));
 
         $columns = $this->get_columns();
         $hidden = array();
@@ -81,7 +72,7 @@ class PL_DL_Contents_List_Table extends WP_List_Table
         $orderby = (!empty($_GET['orderby'])) ? sanitize_text_field($_GET['orderby']) : 'id';
         $order = (!empty($_GET['order']) && in_array(strtoupper($_GET['order']), array('ASC', 'DESC'))) ? strtoupper($_GET['order']) : 'ASC';
 
-        $data = $wpdb->get_results("SELECT wp_pl_dl_contents.*,mem_name1 FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.mem_id = wp_usces_member.ID) $filter_option ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A);
+        $data = $wpdb->get_results("SELECT wp_pl_dl_contents.*,mem_name1 FROM $table_name left outer join wp_usces_member on (wp_pl_dl_contents.mem_id = wp_usces_member.ID) $filter_option ORDER BY $orderby $order ", ARRAY_A);
         $this->items = $data;
     }
 
@@ -106,22 +97,6 @@ class PL_DL_Contents_List_Table extends WP_List_Table
     function column_cb($item)
     {
         return sprintf('<input type="checkbox" name="id[]" value="%s" />', $item['id']);
-    }
-
-    // Make columns sortable
-    function get_sortable_columns()
-    {
-        return array(
-            'id' => array('id', false),
-            'purchase_date' => array('purchase_date', false),
-            'event_name' => array('event_name', false),
-            'item_name' => array('item_name', false),
-            'path' => array('path', false),
-            'email' => array('email', false),
-            'open' => array('open',false),
-            'mailed' => array('mailed',false),
-            'mem_name1' => array('mem_name1',false)
-        );
     }
 
     // Add CSV import form to the menu page
