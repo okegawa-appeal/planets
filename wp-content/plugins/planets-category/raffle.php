@@ -121,7 +121,8 @@ class PL_LotteryCategoryList_Table extends WP_List_Table
         return array(
 			'post_id' => 'ID',
 			'itemName' => 'くじ引き名',
-            'meta_value' => '制限'
+            'meta_value' => '制限',
+            'download' => '結果DL'
         );
     }
 
@@ -160,6 +161,10 @@ class PL_LotteryCategoryList_Table extends WP_List_Table
     function column_default($item, $column_name)
     {
 		return isset($item[$column_name]) ? $item[$column_name] : '';
+    }
+    function column_download($item)
+    {
+        return '<a href="?page=planetsraffle&action=download_csv&post_id=' . $item['post_id'] . '">結果DL</a><br>';
     }
     function column_meta_value($item)
     {
@@ -443,13 +448,84 @@ function test_purchase_reset_nolimit($post_id) {
     }
 }
 
+function download_csv($post_id)
+{
+    ob_clean();
+    ob_start();
+    header("Pragma: public");
+    header("Expires: 0");
+    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+    header("Cache-Control: private", false);
+    header("Content-Type: text/csv");
+    header('Content-Disposition: attachment; filename="export.csv"');
+    global $wpdb;
+    $sql =  " SELECT "
+        ." wp_pl_raffle_order.order_id as 注文番号 "
+        ." ,wp_usces_order.order_date as 注文日時 "
+        ." ,mem_id as 会員No "
+        ." ,mem_email as Eメール "
+        ." ,CONCAT(mem_name1,' ',mem_name2) as 氏名 "
+        ." ,CONCAT(mem_name3,' ',mem_name4) as フリガナ "
+        ." ,nickname.meta_value as ニックネーム "
+        ." ,nickname_kana.meta_value as ニックネーム（読み方） "
+        ." ,mem_tel as 電話番号 "
+        ." ,CONCAT(order_name1,' ',order_name2) as 配送先氏名 "
+        ." ,CONCAT(order_name3,' ',order_name4) as 配送先フリガナ "
+        ." ,order_zip as 配送先郵便番号 "
+        ." ,'日本' as 配送先国 "
+        ." ,order_pref as 配送先都道府県 "
+        ." ,order_address1 as 配送先市町村 "
+        ." ,order_address2 as 配送先番地 "
+        ." ,order_address3 as 配送先ビル名 "
+        ." ,order_tel as 配送先電話番号 "
+        ." ,order_payment_name as 支払方法 "
+        ." ,order_status as ステータス "
+        ." ,wp_usces_skus.code as SKUコード "
+        ." ,itemName as 商品名 "
+        ." ,CONCAT(wp_usces_skus.name,' ',prize,'賞 ',prize_name) as SKU表示名 "
+        ." ,quantity as 数量 "
+        ." ,wp_usces_ordercart.price as 単価 "
+        ."  FROM wp_pl_raffle_order "
+        ."  ,wp_pl_raffle "
+        ."  ,wp_usces_member "
+        ."  ,wp_usces_item "
+        ."  ,wp_usces_skus "
+        ."  ,wp_usces_ordercart "
+        ."  ,wp_usces_order "
+        ."  LEFT OUTER JOIN (select meta_value,member_id FROM wp_usces_member_meta where meta_key = 'csmb_nickname')    as nickname ON nickname.member_id = wp_usces_order.mem_id  "
+        ."  LEFT OUTER JOIN (select meta_value,member_id FROM wp_usces_member_meta where meta_key = 'csmb_nickname_kana') as nickname_kana  ON nickname_kana.member_id = wp_usces_order.mem_id  "
+        ."  WHERE wp_pl_raffle_order.raffle_id =  wp_pl_raffle.ID   "
+        ."  AND wp_pl_raffle_order.post_id = $post_id "
+        ."  AND wp_usces_member.ID = mem_id  "
+        ."  AND wp_pl_raffle_order.order_id is not null  "
+        ."  AND wp_usces_ordercart.order_id = wp_usces_order.ID "
+        ."  AND wp_usces_item.post_id = wp_pl_raffle_order.post_id "
+        ."  AND wp_usces_skus.code = wp_usces_ordercart.sku_code "
+        ."  AND wp_usces_order.ID = wp_pl_raffle_order.order_id "
+        ."  ORDER BY wp_usces_order.ID; ";
+    $data = $wpdb->get_results($sql, ARRAY_A);
+
+    $csv_data = "prize,prize_name,prize_sku,order_email,order_name1,order_name2,order_zip,order_pref,order_address1,order_address2,order_address3,order_tel,order_payment_name,wp_usces_order.order_date,order_status\n";
+//    foreach ($data as $item) {
+//        $csv_data .= "{$item['prize']},{$item['prize_name']},{$item['prize_sku']},{$item['order_email']},{$item['order_name1']},{$item['order_name2']},{$item['order_zip']},{$item['order_pref']},{$item['order_address1']},{$item['order_address2']},{$item['order_address3']},{$item['order_tel']},{$item['order_payment_name']},{$item['order_date']},{$item['order_status']}\n";
+//    }
+//    @header("Content-Transfer-Encoding: binary");
+    echo $csv_data;
+    //ob_end_flush(); // 出力バッファのフラッシュ
+    exit;
+
+}
 //=================================================
 // サブメニューイベント表示
 //=================================================
 function planets_raffle_contents() {
-	ob_start();
     global $wpdb;
-    if(isset($_GET['post_id']) || isset($_GET['post_id'])){
+    if (isset($_GET['action']) && $_GET['action'] === 'download_csv') {
+        $post_id = $_GET['post_id']?$_GET['post_id']:$_GET['post_id'];
+        download_csv($post_id);
+        exit;
+    }else if(isset($_GET['post_id']) || isset($_GET['post_id'])){
+        ob_start();
         $post_id = $_GET['post_id']?$_GET['post_id']:$_GET['post_id'];
         $raffle_use = get_post_meta( $post_id, 'raffle_use', true ); // 現在の値を取得
 
@@ -709,6 +785,7 @@ function planets_raffle_contents() {
         </form></table>
         <?php
     }else{
+        ob_start();
         echo '<h2>くじ引き商品管理</h2>';
             $raffle_table = new PL_LotteryCategoryList_Table();
             $raffle_table->prepare_items();
