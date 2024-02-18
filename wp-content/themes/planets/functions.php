@@ -98,6 +98,13 @@ function my_category_add_form_fields( $taxonomy ) {
     <div id="image_thumbnail" class="uploded-thumbnail">
     </div>
   </div>
+  <div class="form-field form-required">
+    <label for="category-genre">ジャンル</label>
+    <select name="category-genre" id="category-genre">
+      <option value="normal">通常</option>
+      <option value="premium">PREMIUM</option>
+    </select>
+  </div>
   <script type="text/javascript">
   (function ($) {
       var custom_uploader;
@@ -157,6 +164,16 @@ function my_category_edit_form_fields( $tag, $taxonomy ) {
       </div>
     </td>
   </tr>
+  <tr class="form-field term-image-wrap">
+    <th scope="row"><label for="category-genre">ジャンル</label></th>
+    <td>
+    <?php echo get_term_meta( $tag->term_id, 'category-genre', true ); ?>
+    <select name="category-genre" id="category-genre">
+      <option value="normal" SELECTED>通常</option>
+      <option value="premium">PREMIUM</option>
+    </select>
+    </td>
+  </tr>
   <script type="text/javascript">
   (function ($) {
       var custom_uploader;
@@ -199,6 +216,12 @@ function my_category_edit_form_fields( $tag, $taxonomy ) {
 }
 function my_edit_category( $term_id ) {
   $key = 'category-image';
+  if ( isset( $_POST[ $key ] ) && esc_url_raw( $_POST[ $key ] ) ) {
+    update_term_meta( $term_id, $key, $_POST[ $key ] );
+  } else {
+    delete_term_meta( $term_id, $key );
+  }
+  $key = 'category-genre';
   if ( isset( $_POST[ $key ] ) && esc_url_raw( $_POST[ $key ] ) ) {
     update_term_meta( $term_id, $key, $_POST[ $key ] );
   } else {
@@ -683,9 +706,9 @@ add_action('save_post', 'save_bookend');
 
 function taxonomy_checklist_checked_ontop_filter ($args)
 {
-  print_r($args);
-  $args['checked_ontop'] = false;
-  $args['list_only'] = true;
+  //print_r($args);
+  //$args['checked_ontop'] = false;
+  //$args['list_only'] = true;
   return $args;
 
 }

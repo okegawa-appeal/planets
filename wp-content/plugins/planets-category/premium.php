@@ -280,6 +280,22 @@ function pr_delete_data($id) {
     }
 }
 
+//カテゴリフィルタ
+function premium_top_filter($pieces){
+
+    //echo "<pre>";
+    //print_r($pieces);
+    //echo "</pre>";
+
+    //You can change the entire SQL by examining the pieces array
+    $pieces['where'] .= " AND t.term_id IN ( SELECT term_id FROM wp_termmeta WHERE meta_key = 'category-genre' AND meta_value = 'premium')"; 
+    //echo "<pre>";
+    //print_r($pieces);
+    //echo "</pre>";
+
+    return $pieces;
+}
+
 //=================================================
 // サブメニューイベント表示
 //=================================================
@@ -358,6 +374,8 @@ function planets_premium_entry_page_contents() {
         $id = intval($_GET['edit']);
         $data = pr_read_data($id);
     }
+
+    add_filter('terms_clauses', 'premium_top_filter', '', 1);
 
 	?>
     <h2>PREMIUM TOP</h2>

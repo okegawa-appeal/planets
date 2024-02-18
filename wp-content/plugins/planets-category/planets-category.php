@@ -280,6 +280,22 @@ function ev_delete_data($id) {
     }
 }
 
+//カテゴリフィルタ
+function category_top_filter($pieces){
+
+    //echo "<pre>";
+    //print_r($pieces);
+    //echo "</pre>";
+
+    //You can change the entire SQL by examining the pieces array
+    $pieces['where'] .= " AND t.term_id IN ( SELECT term_id FROM wp_termmeta WHERE meta_key = 'category-genre' AND meta_value = 'normal')"; 
+    //echo "<pre>";
+    //print_r($pieces);
+    //echo "</pre>";
+
+    return $pieces;
+}
+
 //=================================================
 // サブメニューイベント表示
 //=================================================
@@ -358,6 +374,8 @@ function planets_event_entry_page_contents() {
         $id = intval($_GET['edit']);
         $data = ev_read_data($id);
     }
+
+    add_filter('terms_clauses', 'category_top_filter', '', 1);
 
 	?>
     <h2>通常 TOP</h2>
