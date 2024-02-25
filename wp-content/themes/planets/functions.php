@@ -167,10 +167,11 @@ function my_category_edit_form_fields( $tag, $taxonomy ) {
   <tr class="form-field term-image-wrap">
     <th scope="row"><label for="category-genre">ジャンル</label></th>
     <td>
-    <?php echo get_term_meta( $tag->term_id, 'category-genre', true ); ?>
+    <?php $genre =  get_term_meta( $tag->term_id, 'category-genre', true ); ?>
+    <?php echo $genre ; ?>
     <select name="category-genre" id="category-genre">
-      <option value="normal" SELECTED>通常</option>
-      <option value="premium">PREMIUM</option>
+      <option value="normal" <?php echo $genre=='normal'?'selected':''; ?>>通常</option>
+      <option value="premium" <?php echo $genre=='premium'?'selected':''; ?>>PREMIUM</option>
     </select>
     </td>
   </tr>
