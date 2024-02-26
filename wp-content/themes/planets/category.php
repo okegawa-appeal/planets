@@ -6,15 +6,20 @@
  * @subpackage Welcart_Basic
  */
 
-get_header();
 global $wpdb;
 global $usces;
+$category_id = get_queried_object_id();
+$genre = get_term_meta( $category_id, 'category-genre', true );
+if($genre == 'premium'){
+	get_header('premium');
+}else{
+	get_header();
+}
 //カテゴリ：を削除
 add_filter( 'get_the_archive_title', function( $title ) {
   return single_cat_title('', false);
 });
 //$category_image = get_term_meta( $item->term_id, 'category-image', true );
-$category_id = get_queried_object_id();
 $category_image = get_term_meta( $category_id, 'category-image', true );
 if(!empty($category_image)){
 	$image = $category_image;

@@ -65,34 +65,6 @@ foreach ($goods as $row){
 }
 ?>
 		</div>
-		<div class="content-title">NEWS</div>
-		<div class="announce_container">
-			<div class="announce_news">
-				<ul>
-<?php
-$args = array(
-	'numberposts'	=> 20,
-	'category'		=> 9
-);
-$postslist = get_posts( $args );
-if( ! empty( $postslist ) ){
-	foreach ( $postslist as $p ){
-		echo '<li><a href="' . get_permalink( $p->ID ) . '">';
-		echo '<p class="annouce_news_date">'.date('Y/m/d',strtotime($p->post_modified)).'</p>';
-		echo '<p class="annouce_news_title">'.$p->post_title.'</p>';
-		echo '</a></li>';
-	}
-}
-?>
-				</ul>
-			</div>
-			<div class="announce_news">
-				<!--ul>
-					<li><a href="https://twitter.com/WPlanets23543" target="_blank"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/xlink.png"></a></li -->
-				<!-- a class="twitter-timeline" data-lang="ja" data-height="400" href="https://twitter.com/MUVUS_oshirase?ref_src=twsrc%5Etfw">Tweets by MUVUS_oshirase</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script -->
-				<!-- /ul -->
-			</div>
-		</div>
 		<div>
 			&nbsp;
 		</div>

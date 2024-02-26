@@ -323,7 +323,7 @@ function planets_premium_entry_page_contents() {
             $rate = intval($_POST['rate']);
             $code = wp_generate_password(8, false);
 
-            ev_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate,$code);
+            pr_insert_data($title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate,$code);
         } elseif ($action === 'update') {
             $id = intval($_POST['id']);
             $title = sanitize_text_field($_POST['title']);
@@ -342,10 +342,10 @@ function planets_premium_entry_page_contents() {
             $type = intval($_POST['type']);
             $open = intval($_POST['open']);
             $rate = intval($_POST['rate']);
-            ev_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate);
+            pr_update_data($id, $title,$talent,$reserve_start,$reserve_start_time,$reserve_end,$event_start, $url,$image,$ord,$type,$open,$category,$slug,$rate);
         } elseif ($action === 'delete') {
             $id = intval($_POST['id']);
-            ev_delete_data($id);
+            pr_delete_data($id);
         } elseif ($action === 'changecategory') {
             $url =  get_category_link( $_POST['category']);
             $image =  get_term_meta( $_POST['category'], 'category-image', true );

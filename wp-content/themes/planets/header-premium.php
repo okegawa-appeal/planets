@@ -40,7 +40,7 @@
 	<div class="inner cf">
 
 			<p class="site-description"><?php bloginfo( 'description' ); ?></p>
-			<div class="site-title"><a href="<?php echo esc_url( home_url( '/premium/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/logo.webp">PREMIUM</a></div>
+			<div class="site-title"><a href="<?php echo esc_url( home_url( '/premium/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/premium.png"></a></div>
 			<?php if ( ! welcart_basic_is_cart_page() ) : ?>
 
 			<div class="snav cf planets-header">
