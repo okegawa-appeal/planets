@@ -67,7 +67,7 @@ function download_contents(){
   $table_name = $wpdb->prefix . 'pl_dl_contents';
   //TODO: 未公開をフィルタさせる
 
-  $query = "SELECT * FROM $table_name where ( mem_id = '".usces_memberinfo('ID','return')."' or email ='".usces_memberinfo( 'mailaddress1' ,'return')."' ) and open = true and work = false order by id desc";
+  $query = "SELECT * FROM $table_name where ( mem_id = '".usces_memberinfo('ID','return')."' or email ='".usces_memberinfo( 'mailaddress1' ,'return')."' ) and open = true order by id desc";
   $results = $wpdb->get_results($query, ARRAY_A);
 
   echo '<h3>ダウンロードコンテンツ</h3>';
