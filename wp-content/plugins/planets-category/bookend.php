@@ -115,7 +115,8 @@ function planets_bookend_entry() {
         $email = $_POST['email'];
 		$bookendid = $_POST['bookendid'];
 		$post_id = $_POST['post_id'];
-        $result = bookend_entry_data($email, $bookendid,$post_id);
+		$publish_date = $_POST['publish_date'];
+        $result = bookend_entry_data($email, $bookendid,$post_id,$publish_date);
         // 画面にメッセージを表示
 		$message_html =<<<EOF
 			
@@ -129,6 +130,20 @@ function planets_bookend_entry() {
 EOF;
 	}
 
+	if ($action === 'info') {
+		$bookendid = $_POST['bookendid'];
+        $result = contents_info($bookendid);
+        // 画面にメッセージを表示
+		$message_html =<<<EOF
+			
+<div class="notice notice-success is-dismissible">
+	<p>
+		{$result}
+	</p>
+</div>
+			
+EOF;
+	}
 	//---------------------------------
 	// HTML表示
 	//---------------------------------
@@ -152,11 +167,25 @@ EOF;
         <label for="post_id">post_id</label></td><td>
         <input type="text" name="post_id" size=50 id="post_id" required>
         </td></tr><tr><td>
+        <label for="post_id">publish_date</label></td><td>
+        <input type="date" name="publish_date" id="publish_date">
+        </td></tr><tr><td>
         <input type="hidden" name="action" value="create">
         <input type="submit" value="登録">
         </td></tr>
     </form></table>
-	
+
+	<table>
+	<form method="post">
+        <tr><td>
+        <label for="bookendid">bookendid</label></td><td>
+        <input type="text" name="bookendid" size=50 id="bookendid" required>
+        </td></tr><tr><td>
+        <input type="hidden" name="action" value="info">
+        <input type="submit" value="参照">
+        </td></tr>
+    </form></table>
+
 </div>
 
 EOF;
@@ -166,7 +195,7 @@ EOF;
 
 }
 // データを読み取り
-function bookend_entry_data($email,$bookendid,$post_id) {
+function bookend_entry_data($email,$bookendid,$post_id,$publish_date) {
 	## bookend ユーザー取得
 	$getuserurl = 'https://license.keyring.net/BookEnd/api/v1.0/GetUserID';
 	$args = array(
@@ -198,7 +227,7 @@ function bookend_entry_data($email,$bookendid,$post_id) {
 	$data = json_decode( $json, true );
 	$userid = $data['UserID'];
 
-	$publish_date = get_post_meta( $post_id, 'publish_date', true ); // 現在の値を取得
+//	$publish_date = get_post_meta( $post_id, 'publish_date', true ); // 現在の値を取得
 	$body = array(
 			'OwnerLoginName' => 'double',
 			'OwnerPassword' => 'D9yEpTJf',
@@ -249,7 +278,40 @@ function bookend_entry_data($email,$bookendid,$post_id) {
 
 	return $result;
 }
+function contents_info($contentsid){
+	$getuserurl = 'https://license.keyring.net/BookEnd/owner/content/info/v1/get';
+	$args = array(
+		'method' => 'POST',
+		'httpversion' => '1.1',
+		'headers'  => array(
+				'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8',
+		),
+		'body' => array(
+			'OwnerLoginName' => 'double',
+			'OwnerPassword' => 'D9yEpTJf',
+			'KeyID' => $contentsid,
+			'Type' => '2'
+		)
+	);
+	$response 	= wp_remote_post( $getuserurl, $args );
+	if (is_wp_error($response)) {
+		$result =  'HTTPリクエストエラー: ' . $response->get_error_message();
+	} else {
+		// ステータスコード
+		$result =  'ステータスコード: ' . wp_remote_retrieve_response_code($response) . "\n";
+		$obj = simplexml_load_string(wp_remote_retrieve_body($response));
+		$json = urldecode(json_encode($obj));
+		$data_array = json_decode($json, true);
+		// レスポンスボディ
+	//	$result = $result .  'レスポンスボディ: ' . $json . "\n";
+	}
+//	return $result;
+//	return $json;
+//	return $data_array;
+	return  $data_array['Title'];
 
+
+}
 function bookend_history($email,$contentsid,$errormsg) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'pl_bookend_history';
