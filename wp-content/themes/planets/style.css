@@ -198,6 +198,10 @@ td.column-description {
 	padding:20px;
 	margin-bottom:5px;
 }
+.announce_container .announce_news ul li.bunner{
+	background-color:initial;
+	margin-bottom:1px;
+}
 .announce_container .announce_news ul li .announce_news_date{
     font-size: .625rem;
     color: var(--color-pinkish-gray);

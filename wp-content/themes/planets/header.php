@@ -88,10 +88,11 @@
 
 	<?php 
 	if ( ( is_front_page() || is_home() )) {
-		if(wp_is_mobile()){
-//			xo_slider( 392 );
+		if (strpos(site_url(), 'localhost') !== false || strpos(site_url(), 'dev.') !== false) {
+			//dev
 			xo_slider( 96 ); 
 		}else{
+			//prod
 			xo_slider( 96 ); 
 		}
 	} 

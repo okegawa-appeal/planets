@@ -12,6 +12,8 @@ $category_id = get_queried_object_id();
 $genre = get_term_meta( $category_id, 'category-genre', true );
 if($genre == 'premium'){
 	get_header('premium');
+}else if($genre == 'lumistar'){
+	get_header('lumistar');
 }else{
 	get_header();
 }

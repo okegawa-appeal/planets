@@ -32,7 +32,7 @@ function add_custom_menu() {
     'カテゴリ', // ①ページタイトル
     'カテゴリ', // ②ラベル
     'manage_options', // ③表示するユーザーの権限
-    'edit-tags.php?taxonomy=category&orderby=id&order=desc', // ④スラッグ名
+    'edit-tags.php?taxonomy=category', // ④スラッグ名
     '', // ⑤遷移後に実行する関数
     'dashicons-category', // ⑥アイコン
     '13' // ⑦表示位置
@@ -65,25 +65,22 @@ add_filter('wpcf7_form_tag', 'my_form_tag_filter', 11);
 function download_contents(){
   global $wpdb;
   $table_name = $wpdb->prefix . 'pl_dl_contents';
-
-  $query = "SELECT * FROM $table_name where ( mem_id = '".usces_memberinfo('ID','return')."' or email ='".usces_memberinfo( 'mailaddress1' ,'return')."' ) and open = true order by id desc";
+  //TODO: 未公開をフィルタさせる
+  $query = "SELECT * FROM $table_name where ( mem_id = '".usces_memberinfo('ID','return')."' or email ='".usces_memberinfo( 'mailaddress1' ,'return')."' ) and open = true and work = false order by id desc";
   $results = $wpdb->get_results($query, ARRAY_A);
 
-  
   echo '<h3>ダウンロードコンテンツ</h3>';
   echo '<table><tr>';
-  echo '<th class="num">タイトル</th>';
   echo '<th scope="row">DL期限</th>';
+  echo '<th class="num">タイトル</th>';
   echo '<th><a href="#">ダウンロード</a></th>';
         foreach ($results as $row) {
-            echo '<tr>';
-            echo '<th>'.$row['item_name'].'</td>';
-            echo '<td >'.$row['purchase_date'].'</td>';
+            echo '<tr><td>'.$row['purchase_date'].'</td>';
+            echo '<td>'.$row['item_name'].'</td>';
             echo '<td><a href="'.$row['path'].'" target="_blank">Download<span class="dashicons dashicons-admin-page"></span></a></td>';
             echo '</tr>';
         }
   echo '</tr></table>';
-
 }
 add_action('usces_action_memberinfo_page_header','download_contents');
 
@@ -99,14 +96,6 @@ function my_category_add_form_fields( $taxonomy ) {
     <input type="button" name="image_clear" value="クリア" />
     <div id="image_thumbnail" class="uploded-thumbnail">
     </div>
-  </div>
-  <div class="form-field form-required">
-    <label for="category-genre">ジャンル</label>
-    <select name="category-genre" id="category-genre">
-      <option value="normal">通常</option>
-      <option value="premium">PREMIUM</option>
-      <option value="lumistar">LUMISTAR</option>
-    </select>
   </div>
   <script type="text/javascript">
   (function ($) {
@@ -167,18 +156,6 @@ function my_category_edit_form_fields( $tag, $taxonomy ) {
       </div>
     </td>
   </tr>
-  <tr class="form-field term-image-wrap">
-    <th scope="row"><label for="category-genre">ジャンル</label></th>
-    <td>
-    <?php $genre =  get_term_meta( $tag->term_id, 'category-genre', true ); ?>
-    <?php echo $genre ; ?>
-    <select name="category-genre" id="category-genre">
-      <option value="normal" <?php echo $genre=='normal'?'selected':''; ?>>通常</option>
-      <option value="premium" <?php echo $genre=='premium'?'selected':''; ?>>PREMIUM</option>
-      <option value="lumistar" <?php echo $genre=='lumistar'?'selected':''; ?>>LUMISTAR</option>
-    </select>
-    </td>
-  </tr>
   <script type="text/javascript">
   (function ($) {
       var custom_uploader;
@@ -221,12 +198,6 @@ function my_category_edit_form_fields( $tag, $taxonomy ) {
 }
 function my_edit_category( $term_id ) {
   $key = 'category-image';
-  if ( isset( $_POST[ $key ] ) && esc_url_raw( $_POST[ $key ] ) ) {
-    update_term_meta( $term_id, $key, $_POST[ $key ] );
-  } else {
-    delete_term_meta( $term_id, $key );
-  }
-  $key = 'category-genre';
   if ( isset( $_POST[ $key ] ) && esc_url_raw( $_POST[ $key ] ) ) {
     update_term_meta( $term_id, $key, $_POST[ $key ] );
   } else {
@@ -302,20 +273,24 @@ function my_the_payment_method($payments, $value){
         echo '<br>';
       }else{
         //bookend商品の場合はクレジット決済に限定する
-        //$sku = wel_get_sku($cart['post_id'],$sku);
-        $bookendid = get_post_meta($cart['post_id'], 'contentsid1', true ); // 現在の値を取得
-        if(isset($bookendid) && !empty($bookendid)){
-          $payments = array(
-            array(
-                'id' => 1,
-                'name' => 'クレジット決済', //支払方法名
-                'explanation' => 'VISA/MASTER/JCB/AMEXをご利用いただけます。', //説明
-                'settlement' => 'acting_zeus_card', //決済種別
-                'module' => '', //決済モジュール
-                'sort' => 1, //表示順序
-                'use' => 'activate', //activeで「使用」
-            ),
-          );  
+        $sku = wel_get_sku($cart['post_id'],$sku);
+        $bookendid = trim($sku['advance']);
+        if(!is_array($bookendid)){
+          if(isset($bookendid) && !empty($bookendid)){
+            if($bookendid != 'Array'){
+              $payments = array(
+                array(
+                    'id' => 1,
+                    'name' => 'クレジット決済', //支払方法名
+                    'explanation' => 'VISA/MASTER/JCB/AMEXをご利用いただけます。', //説明
+                    'settlement' => 'acting_zeus_card', //決済種別
+                    'module' => '', //決済モジュール
+                    'sort' => 1, //表示順序
+                    'use' => 'activate', //activeで「使用」
+                ),
+              );
+            }
+          }
         }
       }
     }
@@ -356,13 +331,13 @@ function add_new_sku_meta_title(){
 
 add_filter( 'usces_filter_sku_meta_form_advance_field', 'add_new_sku_meta_field'); //フィールドを新規追加
 function add_new_sku_meta_field(){
-	return '<td colspan="2" class="item-sku-zaikonum"></td>';
+	return '<td colspan="2" class="item-sku-zaikonum"><input name="newskuadvance" type="text" id="newskuadvance" class="newskuadvance metaboxfield" /></td>';
 }
 
 add_filter( 'usces_filter_sku_meta_row_advance', 'add_new_sku_meta_row_advance',10,2); //フィールドを追加
 function add_new_sku_meta_row_advance( $default_field, $sku ){
 	$metaname = 'itemsku[' .$sku["meta_id"]. '][skuadvance]';
-	return '<td colspan="2" class="item-sku-zaikonum">'.$sku["advance"].'</td>';
+	return '<td colspan="2" class="item-sku-zaikonum"><input name="' .$metaname.'" type="text" id="' .$metaname. '" class="newskuadvance metaboxfield" value="' .$sku["advance"]. '"/></td>';
 }
 
 add_filter( 'usces_filter_add_item_sku_meta_value', 'add_new_sku_meta'); //新規項目を作成
@@ -404,15 +379,20 @@ function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
   $payment = $entries['order']['payment_name'];
   foreach($carts as $cart){
     $sku = wel_get_sku($cart['post_id'],$cart['sku']);
+    //TODO: metaからラッフル商品を取得し、購入数に合わせてくじ引き用商品を確保する
     $raffle_use = get_post_meta($cart['post_id'], 'raffle_use', true ); // 現在の値を取得
+
     if($raffle_use == '1' || $raffle_use == '2'){
       $order_id = $entries['order']['ID'];
       $itemcount = 0;
+      //$skuの種類 x 販売個数
       if(substr($sku['code'],-strlen("1")) === "1"){
-        $itemcount = 1*$cart['quantity'];
+        $itemcount = 1;
       } else if(substr($sku['code'],-strlen("10")) === "10"){
-        $itemcount = 10*$cart['quantity'];
+        //10回券購入
+        $itemcount = 10;
       }
+      echo $raffle_use;
       if($raffle_use == '2'){
         purchase_nolimit($cart['post_id'],$order_id,$itemcount);
       }else{
@@ -421,39 +401,19 @@ function custome_usces_action_cartcompletion_page_body( $entries , $carts ){
     }
 
     //bookend商品登録
-    //$bookendid = trim($sku['advance']);
+    $bookendid = trim($sku['advance']);
     if($payment=='クレジット決済'){
-      $contentsid1 = get_post_meta($cart['post_id'], 'contentsid1', true ); // 現在の値を取得
-      $publish_date1 = get_post_meta($cart['post_id'], 'publish_date1', true ); // 現在の値を取得
-      if(isset($contentsid1) && !empty($contentsid1)){
-        bookend_entry_data($email,$contentsid1,$cart['post_id'],$publish_date1);
-      }
-      $contentsid2 = get_post_meta($cart['post_id'], 'contentsid2', true ); // 現在の値を取得
-      $publish_date2 = get_post_meta($cart['post_id'], 'publish_date2', true ); // 現在の値を取得
-      if(isset($contentsid2) && !empty($contentsid2)){
-        bookend_entry_data($email,$contentsid2,$cart['post_id'],$publish_date2);
-      }
-      $contentsid3 = get_post_meta($cart['post_id'], 'contentsid3', true ); // 現在の値を取得
-      $publish_date3 = get_post_meta($cart['post_id'], 'publish_date3', true ); // 現在の値を取得
-      if(isset($contentsid3) && !empty($contentsid3)){
-        bookend_entry_data($email,$contentsid3,$cart['post_id'],$publish_date3);
-      }
-      $contentsid4 = get_post_meta($cart['post_id'], 'contentsid4', true ); // 現在の値を取得
-      $publish_date4 = get_post_meta($cart['post_id'], 'publish_date4', true ); // 現在の値を取得
-      if(isset($contentsid4) && !empty($contentsid4)){
-        bookend_entry_data($email,$contentsid4,$cart['post_id'],$publish_date4);
-      }
-//        if(!is_array($bookendid)){
-//        if(isset($bookendid) && !empty($bookendid)){
-//          if($bookendid != 'Array'){
-//              //bookend登録処理
-//            bookend_entry_data($email,$bookendid,$cart['post_id']);
-//          }
-//        }
+      if(!is_array($bookendid)){
+        if(isset($bookendid) && !empty($bookendid)){
+          if($bookendid != 'Array'){
+              //bookend登録処理
+            bookend_entry_data($email,$bookendid,$cart['post_id']);
+          }
+        }
       }
     }
   }
-
+}
 add_action( 'usces_action_cartcompletion_page_body', 'custome_usces_action_cartcompletion_page_body' ,10,2);
 
 #### 銀行振込決済完了時（ステータス変更)　####
@@ -658,7 +618,7 @@ function metabox_raffle() {
             <input id="raffle_use1" name="raffle_use" class="toggle_input" value="0" type="radio" <?php echo $raffle_use=="0"?'checked':'' ?> /> 設定しない
             </label><br>
             <label for="raffle_use2" class="toggle_label">
-            <!-- input id="raffle_use2" name="raffle_use" class="toggle_input" value="1" type="radio" <?php echo $raffle_use=="1"?'checked':'' ?> /--> 販売制限付きくじ引き商品に設定する (まだ利用できません)
+            <input id="raffle_use2" name="raffle_use" class="toggle_input" value="1" type="radio" <?php echo $raffle_use=="1"?'checked':'' ?> /> 販売制限付きくじ引き商品に設定する
             </label><br>
             <label for="raffle_use3" class="toggle_label">
             <input id="raffle_use3" name="raffle_use" class="toggle_input" value="2" type="radio" <?php echo $raffle_use=="2"?'checked':'' ?> /> 無制限くじ引き商品に設定する
@@ -696,155 +656,27 @@ function add_custom_bookend_metabox() {
 add_action( 'add_meta_boxes', 'add_custom_bookend_metabox' );
 
 function metabox_bookend() {
-  global $usces;
-  $post_id = get_the_ID();
-  $skus = $usces->get_skus( $post_id );
-  $advance = $skus[0]['advance'];
-  $title = contents_info($advance);
-  $contentsid1 = get_post_meta( $post_id, 'contentsid1', true ); // 現在の値を取得
-  if(isset($contentsid1) && !empty($contentsid1)){
-    $contentsid1_title = contents_info($contentsid1);
-  }
-  $contentsid2 = get_post_meta( $post_id, 'contentsid2', true ); // 現在の値を取得
-  if(isset($contentsid2) && !empty($contentsid2)){
-    $contentsid2_title = contents_info($contentsid2);
-  }
-  $contentsid3 = get_post_meta( $post_id, 'contentsid3', true ); // 現在の値を取得
-  if(isset($contentsid3) && !empty($contentsid3)){
-    $contentsid3_title = contents_info($contentsid3);
-  }
-  $contentsid4 = get_post_meta( $post_id, 'contentsid4', true ); // 現在の値を取得
-  if(isset($contentsid4) && !empty($contentsid4)){
-    $contentsid4_title = contents_info($contentsid4);
-  }
-  $publish_date1 = get_post_meta( $post_id, 'publish_date1', true ); // 現在の値を取得
-  $publish_date2 = get_post_meta( $post_id, 'publish_date2', true ); // 現在の値を取得
-  $publish_date3 = get_post_meta( $post_id, 'publish_date3', true ); // 現在の値を取得
-  $publish_date4 = get_post_meta( $post_id, 'publish_date4', true ); // 現在の値を取得
-  // セキュリティのために追加
-  wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
-  ?>
-  <div class="my-bookend_metabox">
-      <label for="contentsid1" class="toggle_label">contents id(1冊目)</label>
-      <input id="contentsid1" name="contentsid1" value="<?php echo $contentsid1 ?>" type="text" size="30"><br/>
-      タイトル:<?php echo $contentsid1_title ?><br/>
-      <label for="publish_date1" class="toggle_label">公開日</label>
-      <input id="publish_date1" name="publish_date1" value="<?php echo $publish_date1 ?>" type="date" ><br/>
-      <hr/>
-      <label for="contentsid2" class="toggle_label">contents id(2冊目)</label>
-      <input id="contentsid2" name="contentsid2" value="<?php echo $contentsid2 ?>" type="text"  size="30"><br/>
-      タイトル:<?php echo $contentsid2_title ?><br/>
-      <label for="publish_date2" class="toggle_label">公開日</label>
-      <input id="publish_date2" name="publish_date2" value="<?php echo $publish_date2 ?>" type="date" ><br/>
-      <hr/>
-      <label for="contentsid3" class="toggle_label">contents id(3冊目)</label>
-      <input id="contentsid3" name="contentsid3" value="<?php echo $contentsid3 ?>" type="text"  size="30"><br/>
-      タイトル:<?php echo $contentsid3_title ?><br/>
-      <label for="publish_date3" class="toggle_label">公開日</label>
-      <input id="publish_date3" name="publish_date3" value="<?php echo $publish_date3 ?>" type="date" ><br/>
-      <hr/>
-      <label for="contentsid4" class="toggle_label">contents id(4冊目)</label>
-      <input id="contentsid4" name="contentsid4" value="<?php echo $contentsid4 ?>" type="text"  size="30"><br/>
-      タイトル:<?php echo $contentsid4_title ?><br/>
-      <label for="publish_date4" class="toggle_label">公開日</label>
-      <input id="publish_date4" name="publish_date4" value="<?php echo $publish_date4 ?>" type="date" ><br/>
-      <hr/>
-      <br>
-  </div>
-  <?php
+        $post_id = get_the_ID();
+        $contentsid = get_post_meta( $post_id, 'contentsid', true ); // 現在の値を取得
+        $publish_date = get_post_meta( $post_id, 'publish_date', true ); // 現在の値を取得
+        // セキュリティのために追加
+        wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
+        ?>
+        <div class="my-bookend_metabox">
+            <label for="publish_date" class="toggle_label">公開日</label>
+            <input id="publish_date" name="publish_date" value="<?php echo $publish_date ?>" type="date" >
+            <br>
+        </div>
+        <?php
 }
-#### 保存時にカスタムフィールドにbookend公開日を追加 ####
+#### 保存時にカスタムフィールドに銀行振込締切を追加 ####
 function save_bookend($post_id) {
     // セキュリティのため追加
     if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
     if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
-    update_post_meta( $post_id, 'contentsid1', $_POST['contentsid1'] );
-    update_post_meta( $post_id, 'contentsid2', $_POST['contentsid2'] );
-    update_post_meta( $post_id, 'contentsid3', $_POST['contentsid3'] );
-    update_post_meta( $post_id, 'contentsid4', $_POST['contentsid4'] );
-    update_post_meta( $post_id, 'publish_date1', $_POST['publish_date1'] );
-    update_post_meta( $post_id, 'publish_date2', $_POST['publish_date2'] );
-    update_post_meta( $post_id, 'publish_date3', $_POST['publish_date3'] );
-    update_post_meta( $post_id, 'publish_date4', $_POST['publish_date4'] );
+    update_post_meta( $post_id, 'publish_date', $_POST['publish_date'] );
 }
 add_action('save_post', 'save_bookend');
 
-#### 商品画面のカテゴリ並び順を変更 ####
-
-function taxonomy_checklist_checked_ontop_filter ($args)
-{
-  //print_r($args);
-  //$args['checked_ontop'] = false;
-  //$args['list_only'] = true;
-  return $args;
-
-}
-
-add_filter('wp_terms_checklist_args','taxonomy_checklist_checked_ontop_filter');
-
-
-#### 商品画面にoricon metaboxを追加 ####
-function add_custom_oricon_metabox() {
-  $itemcode = ''; $page = '';
-  if ( isset($_GET['post']) ) $itemcode = get_post_meta( absint($_GET['post']), '_itemCode', true );
-  if ( isset($_GET['page']) ) $page = $_GET['page'];
-  if ( $page == 'usces_itemedit' || $page == 'usces_itemnew' || $itemcode ) {
-      add_meta_box( 'oricon-metabox', 'オリコン登録情報', 'metabox_oricon', 'post', 'side', 'low' );
-  }
-}
-add_action( 'add_meta_boxes', 'add_custom_oricon_metabox' );
-
-function metabox_oricon() {
-  global $usces;
-  $post_id = get_the_ID();
-  $jancode = get_post_meta( $post_id, 'jancode', true ); // 現在の値を取得
-  $artistname = get_post_meta( $post_id, 'artistname', true ); // 現在の値を取得
-  $mediatype = get_post_meta( $post_id, 'mediatype', true ); // 現在の値を取得
-   // セキュリティのために追加
-  wp_nonce_field( 'wp-nonce-key', '_wp_nonce_my_option' );
-  ?>
-  <div class="my-oricon_metabox">
-      <label for="jancode" class="toggle_label">JAN CODE</label>
-      <input id="jancode" name="jancode" value="<?php echo $jancode ?>" type="text" size="30"><br/>
-      <br>
-      <label for="artistname" class="toggle_label">アーティスト名</label>
-      <input id="artistname" name="artistname" value="<?php echo $artistname ?>" type="text" size="30"><br/>
-      <br>
-      <label for="mediatype" class="toggle_label">種類</label>
-      <SELECT id="mediatype" name="mediatype" value="<?php echo $mediatype ?>" >
-        <OPTION></OPTION>
-        <OPTION VALUE="CD">CD</OPTION>
-        <OPTION VALUE="DVD">DVD</OPTION>
-        <OPTION VALUE="BD">BD</OPTION>
-        <OPTION VALUE="BOOK">BOOK</OPTION>
-      </SELECT>
-
-      <br>
-  </div>
-  <?php
-}
-#### 保存時にカスタムフィールドにbookend公開日を追加 ####
-function save_oricon($post_id) {
-  // セキュリティのため追加
-  if ( ! isset( $_POST['_wp_nonce_my_option'] ) || ! $_POST['_wp_nonce_my_option'] ) return;
-  if ( ! check_admin_referer( 'wp-nonce-key', '_wp_nonce_my_option' ) ) return;
-  update_post_meta( $post_id, 'jancode', $_POST['jancode'] );
-  update_post_meta( $post_id, 'artistname', $_POST['artistname'] );
-  update_post_meta( $post_id, 'mediatype', $_POST['mediatype'] );
-}
-add_action('save_post', 'save_oricon');
-
-function ends_with($haystack, $needle) {
-  // URLの末尾のスラッシュを除去
-  $haystack = rtrim($haystack, '/');
-  $needle = rtrim($needle, '/');
-
-  $length = strlen($needle);
-  if ($length == 0) {
-      return true;
-  }
-  return (substr($haystack, -$length) === $needle);
-}
 
 ?>
-

@@ -40,7 +40,7 @@
 	<div class="inner cf">
 
 			<p class="site-description"><?php bloginfo( 'description' ); ?></p>
-			<div class="site-title"><a href="<?php echo esc_url( home_url( '/premium/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/premium.png"></a></div>
+			<div class="site-title"><a href="<?php echo esc_url( home_url( '/lumistar/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/logo.webp"></a>LUMISTAR</div>
 			<?php if ( ! welcart_basic_is_cart_page() ) : ?>
 
 			<div class="snav cf planets-header">
@@ -82,16 +82,15 @@
 	</header><!-- #masthead -->
 
 	<?php 
-	if (ends_with($_SERVER['REQUEST_URI'], 'premium')) {
+	if (ends_with($_SERVER['REQUEST_URI'], 'lumistar')) {
 		if (strpos(site_url(), 'localhost') !== false || strpos(site_url(), 'dev.') !== false) {
-			//dev
-			xo_slider( 458 ); 
+			//dev 
+			xo_slider( 474 ); 
 		}else{
 			//prod
-			xo_slider( 742 ); 
+			xo_slider( 1029 ); 
 		}
 	}
-	
 	$class = 'one-column';
 	?>
 
