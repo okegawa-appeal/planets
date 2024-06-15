@@ -96,7 +96,7 @@ class PL_ReportDetail_Table extends WP_List_Table
             $offset = ($current_page - 1) * $per_page;
 
             $sql = "select "
-            ."item_name,item_code,wp_usces_skus.name,order_payment_name,order_status,sum(wp_usces_skus.price*quantity) as total,wp_usces_skus.price,SUM(quantity) as count "
+            ."item_name,item_code,wp_usces_skus.name,order_payment_name,order_status,sum(wp_usces_ordercart.price*quantity) as total,wp_usces_ordercart.price,SUM(quantity) as count "
             ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order,wp_usces_skus  "  
             ."where  "
             ." wp_term_relationships.term_taxonomy_id = $term_id " 
@@ -104,8 +104,7 @@ class PL_ReportDetail_Table extends WP_List_Table
             ." and wp_usces_order.ID= wp_usces_ordercart.order_id "
             ." and wp_usces_ordercart.sku_code = wp_usces_skus.code "
             ." and wp_usces_ordercart.post_id = wp_usces_skus.post_id "
-            ." group by item_name,item_code,wp_usces_skus.name,wp_usces_skus.price,order_payment_name,order_status ";
-
+            ." group by item_name,item_code,wp_usces_skus.name,wp_usces_ordercart.price,order_payment_name,order_status ";
             $total_items = $wpdb->get_var($sql);
             $this->set_pagination_args(array(
                 'total_items' => $total_items,
@@ -137,46 +136,81 @@ class PL_ReportDetail_Table extends WP_List_Table
         if(!empty($_GET['term_id'])){
             $term_id = $_GET['term_id'];
             $sql = "select "
-            ."sum(price*quantity) as price "
-            ."FROM wp_term_relationships,wp_usces_ordercart  "
-            ."where   "
+            ."sum(wp_usces_ordercart.price*quantity) as price "
+            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order,wp_usces_skus  "
+            ."WHERE   "
             ."wp_term_relationships.term_taxonomy_id = $term_id  "
-            ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  ";
+            ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  "
+            ."and wp_usces_order.ID= wp_usces_ordercart.order_id   "
+            ."and wp_usces_ordercart.sku_code = wp_usces_skus.code   "
+            ."and wp_usces_ordercart.post_id = wp_usces_skus.post_id   ";
             $data = $wpdb->get_results($sql , ARRAY_A);
         }
         return $data;
     }
-    private function calculate_total_omit_cancel() {
+    private function calculate_total_cancel() {
         global $wpdb;
         if(!empty($_GET['term_id'])){
             $term_id = $_GET['term_id'];
             $sql = "select "
-            ."sum(price*quantity) as price "
-            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order  "
+            ."sum(wp_usces_ordercart.price*quantity) as price "
+            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order,wp_usces_skus  "
             ."where   "
             ."wp_term_relationships.term_taxonomy_id = $term_id  "
             ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  "
-            ."and wp_usces_order.ID= wp_usces_ordercart.order_id "
-            ."and order_status not like '%cancel%' " ;
+            ."and wp_usces_order.ID= wp_usces_ordercart.order_id   "
+            ."and wp_usces_ordercart.sku_code = wp_usces_skus.code   "
+            ."and wp_usces_ordercart.post_id = wp_usces_skus.post_id   "
+            ."and order_status like '%cancel%' " ;
             $data = $wpdb->get_results($sql , ARRAY_A);
         }
         return $data;
     }
-
-    public function display() {
-        // 合計値を計算
-        $data = $this->calculate_total();
-        $data2 = $this->calculate_total_omit_cancel();
-
-        // テーブルを表示
-        parent::display();
-
-        // 合計値を表示
-        echo '合計: ' . "¥".number_format($data[0]['price'],0);
-        echo '<hr>';
-        // 合計値を表示
-        echo '合計(キャンセル除く): ' . "¥".number_format($data2[0]['price'],0);
+    private function calculate_total_noreceipt() {
+        global $wpdb;
+        if(!empty($_GET['term_id'])){
+            $term_id = $_GET['term_id'];
+            $sql = "select "
+            ."sum(wp_usces_ordercart.price*quantity) as price "
+            ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order,wp_usces_skus  "
+            ."where   "
+            ."wp_term_relationships.term_taxonomy_id = $term_id  "
+            ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  "
+            ."and wp_usces_order.ID= wp_usces_ordercart.order_id   "
+            ."and wp_usces_ordercart.sku_code = wp_usces_skus.code   "
+            ."and wp_usces_ordercart.post_id = wp_usces_skus.post_id   "
+            ."and order_status like '%noreceipt%' " 
+            ."and order_status not like '%cancel%' ";
+            $data = $wpdb->get_results($sql , ARRAY_A);
+        }
+        return $data;
     }
+    public function display() {
+
+        global $wpdb;
+        if(!empty($_GET['term_id'])){
+            $term_id = $_GET['term_id'];
+            // 合計値を計算
+            $data = $this->calculate_total();
+            $data2 = $this->calculate_total_cancel();
+            $data3 = $this->calculate_total_noreceipt();
+            $sql = "select * FROM wp_pl_event where category = $term_id ";
+            $row = $wpdb->get_row($sql);
+            // テーブルを表示
+            parent::display();
+
+            // 合計値を表示
+            echo '(1)売上: ' . "¥".number_format($data[0]['price'],0) . '<br/>';
+            echo '(2)キャンセル: ' . "¥".number_format($data2[0]['price'],0) . '<br/>';
+            echo '(3)未入金: ' . "¥".number_format($data3[0]['price'],0) . '<br/>';
+            echo '(4)入金予定額: ' . "¥".number_format($data[0]['price']-$data2[0]['price']-$data3[0]['price'],0) . '<br/>';
+            echo '※売上(1) - キャンセル(2) - 未入金(3)<br/>' ;
+            echo '<br/>';
+            echo '(5)お支払い比率: '. $row->rate .'%<br/>';
+            echo '<b>(6)お支払い予定額(税込): ' . "¥".number_format(($data[0]['price']-$data2[0]['price']-$data3[0]['price'])/100*$row->rate,0) .'</b><br/>';
+            echo '※入金予定額(4) x お支払い比率(5)' ;
+        }
+}
 
     function column_Price($item)
     {
