@@ -46,7 +46,7 @@ get_header();
                         echo '</tr>';
 
                         $sql = "select "
-                        ."item_name,item_code,wp_usces_skus.name,order_payment_name,order_status,wp_usces_skus.price,sum(wp_usces_skus.price*quantity) as total,SUM(quantity) as count "
+                        ."item_name,item_code,wp_usces_skus.name,order_payment_name,order_status,wp_usces_ordercart.price,sum(wp_usces_ordercart.price*quantity) as total,SUM(quantity) as count "
                         ."FROM wp_term_relationships,wp_usces_ordercart,wp_usces_order,wp_terms,wp_usces_skus "  
                         ."where  "
                         ." wp_term_relationships.term_taxonomy_id = $term_id " 
@@ -56,7 +56,7 @@ get_header();
                         ." and wp_usces_order.ID= wp_usces_ordercart.order_id "
                         ." and wp_usces_ordercart.sku_code  = wp_usces_skus.code "
                         ." and wp_usces_ordercart.post_id = wp_usces_skus.post_id "
-                        ." group by item_name,item_code,wp_usces_skus.name,wp_usces_skus.price,order_payment_name,order_status ";
+                        ." group by item_name,item_code,wp_usces_skus.name,wp_usces_ordercart.price,order_payment_name,order_status ";
 
 
                         $detail = $wpdb->get_results($sql . " ORDER BY $orderby $order ", ARRAY_A);
@@ -87,35 +87,60 @@ get_header();
                                 }
                                 echo '</table>';
 
+                    
                         $sql = "select "
-                        ."sum(price*quantity) as price "
-                        ."FROM wp_term_relationships,wp_usces_ordercart,wp_terms  "
+                        ."sum(wp_usces_ordercart.price*quantity) as price "
+                        ."FROM wp_term_relationships,wp_usces_ordercart,wp_terms,wp_usces_order,wp_usces_skus  "
                         ."where   "
                         ."wp_term_relationships.term_taxonomy_id = $term_id  "
                         ."and wp_term_relationships.term_taxonomy_id = wp_terms.term_id "
-                        ."and wp_terms.slug = '" . $slug ."'"
+                        ."and wp_terms.slug = '" . $slug ."' "
+                        ."and wp_usces_order.ID= wp_usces_ordercart.order_id   "
+                        ."and wp_usces_ordercart.sku_code = wp_usces_skus.code   "
+                        ."and wp_usces_ordercart.post_id = wp_usces_skus.post_id   "
                         ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  ";
-                        $total = $wpdb->get_results($sql , ARRAY_A);
-                        echo '<hr>';
-                        echo '合計(税込): ' . "¥".number_format($total[0]['price'],0);
+                        $data = $wpdb->get_results($sql , ARRAY_A);
 
                         $sql = "select "
-                        ."sum(price*quantity) as price "
-                        ."FROM wp_term_relationships,wp_usces_ordercart,wp_terms,wp_usces_order  "
+                        ."sum(wp_usces_ordercart.price*quantity) as price "
+                        ."FROM wp_term_relationships,wp_usces_ordercart,wp_terms,wp_usces_order,wp_usces_skus  "
                         ."where   "
                         ."wp_term_relationships.term_taxonomy_id = $term_id  "
                         ."and wp_term_relationships.term_taxonomy_id = wp_terms.term_id "
-                        ." and wp_usces_order.ID= wp_usces_ordercart.order_id "
                         ."and wp_terms.slug = '" . $slug ."' "
-                        ."and order_status not like '%cancel%' " 
+                        ."and order_status like '%cancel%' " 
+                        ."and wp_usces_order.ID= wp_usces_ordercart.order_id   "
+                        ."and wp_usces_ordercart.sku_code = wp_usces_skus.code   "
+                        ."and wp_usces_ordercart.post_id = wp_usces_skus.post_id   "
                         ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  ";
-                        $total = $wpdb->get_results($sql , ARRAY_A);
-                        echo '<br>';
-                        echo '合計(税込)(キャンセル除く): ' . "¥".number_format($total[0]['price'],0);
+                        $data2 = $wpdb->get_results($sql , ARRAY_A);
+
+                        $sql = "select "
+                        ."sum(wp_usces_ordercart.price*quantity) as price "
+                        ."FROM wp_term_relationships,wp_usces_ordercart,wp_terms,wp_usces_order,wp_usces_skus  "
+                        ."where   "
+                        ."wp_term_relationships.term_taxonomy_id = $term_id  "
+                        ."and wp_term_relationships.term_taxonomy_id = wp_terms.term_id "
+                        ."and wp_terms.slug = '" . $slug ."' "
+                        ."and order_status like '%noreceipt%' " 
+                        ."and order_status not like '%cancel%' "
+                        ."and wp_usces_order.ID= wp_usces_ordercart.order_id   "
+                        ."and wp_usces_ordercart.sku_code = wp_usces_skus.code   "
+                        ."and wp_usces_ordercart.post_id = wp_usces_skus.post_id   "
+                        ."and wp_usces_ordercart.post_id = wp_term_relationships.object_id  ";
+                        $data3 = $wpdb->get_results($sql , ARRAY_A);
+                        // 合計値を表示
                         echo '<hr>';
-                        echo 'お支払い比率: '. $row->rate .'%';
-                        echo '<br>';
-                        echo 'お支払い予定額(税込): ' . "¥".number_format($total[0]['price']/100*$row->rate,0);
+                        echo '(1)売上: ' . "¥".number_format($data[0]['price'],0) . '<br/>';
+                        echo '(2)キャンセル: ' . "¥".number_format($data2[0]['price'],0) . '<br/>';
+                        echo '(3)未入金: ' . "¥".number_format($data3[0]['price'],0) . '<br/>';
+                        echo '(4)売上確定額: ' . "¥".number_format($data[0]['price']-$data2[0]['price']-$data3[0]['price'],0) . '<br/>';
+                        echo '※売上(1) - キャンセル(2) - 未入金(3)<br/>' ;
+                        echo '<br/>';
+                        echo '(5)お支払い比率: '. $row->rate .'%<br/>';
+                        echo '<b>(6)お支払い予定額(税込): ' . "¥".number_format(($data[0]['price']-$data2[0]['price']-$data3[0]['price'])/100*$row->rate,0) .'</b><br/>';
+                        echo '※入金予定額(4) x お支払い比率(5)' ;
+
                 }
         }
 

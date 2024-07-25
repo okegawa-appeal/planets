@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <style>
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>イベント管理</h1>
+    <video id="camera" width="100%" height="auto" playsinline></video>
+    <div id="result"></div>
+    <button id="submitButton" style="display: none;">Submit Result</button>
+
+    <script src="./jsQR.js"></script>
+    <script>
+        const video = document.getElementById('camera');
+        const resultDiv = document.getElementById('result');
+        const submitButton = document.getElementById('submitButton');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+            .then((stream) => {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch((err) => {
+                console.error('Error accessing camera:', err);
+            });
+
+        video.addEventListener('loadedmetadata', () => {
+            const canvas = document.createElement('canvas');
+            const canvasContext = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const tick = () => {
+                canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert',
+                });
+
+                if (code) {
+                    resultDiv.innerText = 'QRコード検知: ' + code.data;
+                    submitButton.style.display = 'block';
+                    // You can send code.data to the server and perform further actions
+                } else {
+                    resultDiv.innerText = 'QRコードがありません';
+                    submitButton.style.display = 'none';
+                }
+
+                requestAnimationFrame(tick);
+            };
+
+            tick();
+        });
+
+        submitButton.addEventListener('click', () => {
+            // Perform actions to submit the result to the server
+            alert('Submitting result to the server: ' + resultDiv.innerText);
+        });
+    </script>
+</body>
+</html>
