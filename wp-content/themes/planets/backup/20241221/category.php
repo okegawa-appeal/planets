@@ -14,8 +14,6 @@ if($genre == 'premium'){
 	get_header('premium');
 }else if($genre == 'lumistar'){
 	get_header('lumistar');
-}else if($genre == 'entame'){
-	get_header('entame');
 }else{
 	get_header();
 }

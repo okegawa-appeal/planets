@@ -31,13 +31,14 @@ class PL_Report_Table extends WP_List_Table
     {
         global $wpdb;
 
-        $per_page = 100;
+        $per_page = 10;
         $current_page = $this->get_pagenum();
         $offset = ($current_page - 1) * $per_page;
 
-        $sql = "select wp_term_taxonomy.term_id,name FROM wp_term_taxonomy,wp_terms where parent = 2 and wp_term_taxonomy.term_taxonomy_id = wp_terms.term_id";
+        $sql = "select count(*) FROM (select wp_term_taxonomy.term_id,name FROM wp_term_taxonomy,wp_terms where parent = 2 and wp_term_taxonomy.term_taxonomy_id = wp_terms.term_id) AS subquery";
 
         $total_items = $wpdb->get_var($sql);
+
 		$this->set_pagination_args(array(
             'total_items' => $total_items,
             'per_page'    => $per_page,
@@ -49,6 +50,7 @@ class PL_Report_Table extends WP_List_Table
 
         $this->_column_headers = array($columns, $hidden, $sortable);
 
+        $sql = "select wp_term_taxonomy.term_id,name FROM wp_term_taxonomy,wp_terms where parent = 2 and wp_term_taxonomy.term_taxonomy_id = wp_terms.term_id";
         $data = $wpdb->get_results($sql . " ORDER BY term_id DESC LIMIT $per_page OFFSET $offset", ARRAY_A);
         $this->items = $data;
     }
@@ -105,12 +107,13 @@ class PL_ReportDetail_Table extends WP_List_Table
             ." and wp_usces_ordercart.sku_code = wp_usces_skus.code "
             ." and wp_usces_ordercart.post_id = wp_usces_skus.post_id "
             ." group by item_name,item_code,wp_usces_skus.name,wp_usces_ordercart.price,order_payment_name,order_status ";
-            $total_items = $wpdb->get_var($sql);
+
+/*            $total_items = $wpdb->get_var($sql);
             $this->set_pagination_args(array(
                 'total_items' => $total_items,
                 'per_page'    => $per_page,
             ));
-
+*/
             $columns = $this->get_columns();
             $hidden = array();
             $sortable = $this->get_sortable_columns();
@@ -120,7 +123,8 @@ class PL_ReportDetail_Table extends WP_List_Table
             $orderby = (!empty($_GET['orderby'])) ? sanitize_text_field($_GET['orderby']) : 'id';
             $order = (!empty($_GET['order']) && in_array(strtoupper($_GET['order']), array('ASC', 'DESC'))) ? strtoupper($_GET['order']) : 'DESC';
 
-            $data = $wpdb->get_results($sql . " ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A);
+//            $data = $wpdb->get_results($sql . " ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", ARRAY_A);
+            $data = $wpdb->get_results($sql . " ORDER BY $orderby $order ", ARRAY_A);
             $this->items = $data;
         }
     }

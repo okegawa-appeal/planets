@@ -1,20 +1,19 @@
 <?php
 /**
- * Header Template
+ * Template Name: entame
  *
  * @package Welcart
  * @subpackage Welcart_Basic
  */
-
-get_header();
+get_header('entame');
 global $wpdb;
-$query = "select * FROM wp_pl_event where type = '1' and open = '1' and genre = 0  order by ord desc";
+$query = "select * FROM wp_pl_event where type = '1' and open = '1' and genre = 3 order by ord desc";
 $events = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 $current_datetime = new DateTime("now", new DateTimeZone("JST"));  // 例: Current_datetimeから取得したUTC日付
 
 ?> 
 	<div id="primary" class="site-content">
-		<div class="content-title">EVENT</div>
+		<div class="content-title">DIGITAL BOOK</div>
 		<div id="content" role="main">
 			<ul class="category-container">
 <?php 
@@ -45,7 +44,7 @@ foreach ($events as $row){
 			<ul class="category-container">
 <?php 
 global $wpdb;
-$query = "select * FROM wp_pl_event where type = '2' and open = '1' and genre = 0  order by ord desc";
+$query = "select * FROM wp_pl_event where type = '2' and open = '1' and genre = 3 order by ord desc";
 $goods = $wpdb->get_results($wpdb->prepare($query),"ARRAY_A");
 foreach ($goods as $row){  
 	//var_dump($row);
@@ -65,40 +64,6 @@ foreach ($goods as $row){
 	}
 }
 ?>
-		</div>
-		<div class="content-title">NEWS</div>
-		<div class="announce_container">
-			<div class="announce_news">
-				<ul>
-<?php
-$args = array(
-	'numberposts'	=> 20,
-	'category'		=> 9
-);
-$postslist = get_posts( $args );
-if( ! empty( $postslist ) ){
-	foreach ( $postslist as $p ){
-		echo '<li><a href="' . get_permalink( $p->ID ) . '">';
-		echo '<p class="annouce_news_date">'.date('Y/m/d',strtotime($p->post_modified)).'</p>';
-		echo '<p class="annouce_news_title">'.$p->post_title.'</p>';
-		echo '</a></li>';
-	}
-}
-?>
-				</ul>
-			</div>
-			<div class="announce_news">
-				<ul>
-					<li class="twitter"><a href="https://twitter.com/WPlanets23543" target="_blank"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/xlink.png"></a></li>
-				<!-- a class="twitter-timeline" data-lang="ja" data-height="400" href="https://twitter.com/MUVUS_oshirase?ref_src=twsrc%5Etfw">Tweets by MUVUS_oshirase</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script -->
-				</ul>
-				<ul>
-					<li class="bunner"><a href="https://planets-w.jp/premium/" ><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/premium-bunner.jpg"></a></li>
-				</ul>
-				<ul>
-					<li class="bunner"><a href="https://planets-w.jp/entame/" ><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/entame-bunner.jpg"></a></li>
-				</ul>
-			</div>
 		</div>
 		<div>
 			&nbsp;

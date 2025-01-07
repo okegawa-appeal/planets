@@ -106,7 +106,6 @@ function my_category_add_form_fields( $taxonomy ) {
       <option value="normal">通常</option>
       <option value="premium">PREMIUM</option>
       <option value="lumistar">LUMISTAR</option>
-      <option value="entame">ENTAME</option>
     </select>
   </div>
   <script type="text/javascript">
@@ -177,7 +176,6 @@ function my_category_edit_form_fields( $tag, $taxonomy ) {
       <option value="normal" <?php echo $genre=='normal'?'selected':''; ?>>通常</option>
       <option value="premium" <?php echo $genre=='premium'?'selected':''; ?>>PREMIUM</option>
       <option value="lumistar" <?php echo $genre=='lumistar'?'selected':''; ?>>LUMISTAR</option>
-      <option value="entame" <?php echo $genre=='entame'?'selected':''; ?>>ENTAME</option>
     </select>
     </td>
   </tr>
@@ -847,5 +845,6 @@ function ends_with($haystack, $needle) {
   }
   return (substr($haystack, -$length) === $needle);
 }
+
 ?>
 
