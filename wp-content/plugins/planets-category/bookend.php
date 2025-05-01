@@ -112,12 +112,28 @@ function planets_bookend_entry() {
     $action = $_POST['action'];
 
     if ($action === 'create') {
-        $email = $_POST['email'];
+//        $email = $_POST['emails'];
+		// フォームからの入力を取得（改行区切りの文字列）
+		$raw_emails = $_POST['emails'] ?? '';
+		// 改行で分割して配列にする
+		$email_array = preg_split("/\r\n|\r|\n/", trim($raw_emails));
+		// 空の行を除去し、先頭・末尾の空白も削除
+		$email_array = array_filter(array_map('trim', $email_array));
+		// 最大30件までに制限
+		$email_array = array_slice($email_array, 0, 30);
+
 		$bookendid = $_POST['bookendid'];
 		$post_id = $_POST['post_id'];
 		$publish_date = $_POST['publish_date'];
-        $result = bookend_entry_data($email, $bookendid,$post_id,$publish_date);
-        // 画面にメッセージを表示
+
+		// デバッグ用出力
+		foreach ($email_array as $email) {
+//			echo htmlspecialchars($email) . "<br>";
+			$result = bookend_entry_data($email, $bookendid,$post_id,$publish_date);
+			sleep(1);
+		}
+
+		// 画面にメッセージを表示
 		$message_html =<<<EOF
 			
 <div class="notice notice-success is-dismissible">
@@ -159,7 +175,7 @@ EOF;
     <form method="post">
         <tr><td>
         <label for="email">email</label></td><td>
-        <input type="text" name="email" size=50 id="email" required>
+		<textarea name="emails" id="emails" rows="10" cols="50" required placeholder="1行に1つずつ、最大30個まで入力してください"></textarea>
         </td></tr><tr><td>
         <label for="bookendid">bookendid</label></td><td>
         <input type="text" name="bookendid" size=50 id="bookendid" required>
